@@ -60,18 +60,6 @@ You can also specify additional options, as detailed in the manpage. This includ
 ## Dependencies
 The following dependencies will need to be installed for a successful build, depending on your OS/distro.
 
-### Ubuntu 18/20.04 LTS
-Run this command to install all dependencies:
-```
-sudo apt install autoconf gcc make pkg-config libpam0g-dev libcairo2-dev libfontconfig1-dev libxcb-composite0-dev libev-dev libx11-xcb-dev libxcb-xkb-dev libxcb-xinerama0-dev libxcb-randr0-dev libxcb-image0-dev libxcb-util-dev libxcb-xrm-dev libxkbcommon-dev libxkbcommon-x11-dev libjpeg-dev
-```
-
-### Debian
-Replace `libxcb-util-dev` with `libxcb-util0-dev` in the Ubuntu installation command:
-```
-sudo apt install autoconf gcc make pkg-config libpam0g-dev libcairo2-dev libfontconfig1-dev libxcb-composite0-dev libev-dev libx11-xcb-dev libxcb-xkb-dev libxcb-xinerama0-dev libxcb-randr0-dev libxcb-image0-dev libxcb-util0-dev libxcb-xrm-dev libxkbcommon-dev libxkbcommon-x11-dev libjpeg-dev
-```
-
 ### Arch Linux
 - autoconf
 - cairo
@@ -87,11 +75,23 @@ sudo apt install autoconf gcc make pkg-config libpam0g-dev libcairo2-dev libfont
 - xcb-util-image
 - xcb-util-xrm
 
+### Debian
+Run this command to install all dependencies:
+```
+sudo apt install autoconf gcc make pkg-config libpam0g-dev libcairo2-dev libfontconfig1-dev libxcb-composite0-dev libev-dev libx11-xcb-dev libxcb-xkb-dev libxcb-xinerama0-dev libxcb-randr0-dev libxcb-image0-dev libxcb-util0-dev libxcb-xrm-dev libxkbcommon-dev libxkbcommon-x11-dev libjpeg-dev
+```
+
 ### Fedora
 Run this command to install all dependencies:
 
 ```sh
 sudo dnf install -y autoconf automake cairo-devel fontconfig gcc libev-devel libjpeg-turbo-devel libXinerama libxkbcommon-devel libxkbcommon-x11-devel libXrandr pam-devel pkgconf xcb-util-image-devel xcb-util-xrm-devel
+```
+
+### Ubuntu 18/20.04 LTS
+Run this command to install all dependencies:
+```
+sudo apt install autoconf gcc make pkg-config libpam0g-dev libcairo2-dev libfontconfig1-dev libxcb-composite0-dev libev-dev libx11-xcb-dev libxcb-xkb-dev libxcb-xinerama0-dev libxcb-randr0-dev libxcb-image0-dev libxcb-util-dev libxcb-xrm-dev libxkbcommon-dev libxkbcommon-x11-dev libjpeg-dev
 ```
 
 ## Building i3lock-color
@@ -122,6 +122,9 @@ You may choose to modify the script based on your needs/OS/distro.
 ~~[Stable version in Community](https://www.archlinux.org/packages/community/x86_64/i3lock-color/)~~
 
 Unfortunately the previous maintainer left, and the package got dumped back into the AUR where I'm now maintaining it. I'm looking for a TU to sponsor it back into Community, but for now, get it on AUR:
+
+## Gentoo Package
+i3lock-color is available on **GURU**, under `x11-misc/i3lock-color` (https://github.com/gentoo/guru/tree/master/x11-misc/i3lock-color).
 
 [Release Version on AUR](https://aur.archlinux.org/packages/i3lock-color/)
 
