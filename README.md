@@ -11,7 +11,8 @@
 ![GitHub Release Date](https://img.shields.io/github/release-date/Raymo111/i3lock-color?label=latest%20release)
 ![Commits](https://img.shields.io/github/commits-since/Raymo111/i3lock-color/latest?include_prereleases&sort=semver)
 ![Latest commit](https://img.shields.io/github/last-commit/Raymo111/i3lock-color)
-![Arch Linux package](https://img.shields.io/archlinux/v/community/x86_64/i3lock-color?logo=arch%20linux&label=Community%20version)
+<!--![Arch Linux package](https://img.shields.io/archlinux/v/community/x86_64/i3lock-color?logo=arch%20linux&label=Community%20version)-->
+![AUR release ver](https://img.shields.io/aur/version/i3lock-color?label=AUR%20release%20ver)
 ![AUR git ver](https://img.shields.io/aur/version/i3lock-color-git?label=AUR%20git%20ver)
 ![AUR votes](https://img.shields.io/aur/votes/i3lock-color-git)
 ![GitHub forks](https://img.shields.io/github/forks/Raymo111/i3lock-color)
@@ -118,7 +119,11 @@ chmod +x install-i3lock-color.sh
 You may choose to modify the script based on your needs/OS/distro.
 
 ## Arch Linux Packages
-[Stable version in Community](https://www.archlinux.org/packages/community/x86_64/i3lock-color/)
+~~[Stable version in Community](https://www.archlinux.org/packages/community/x86_64/i3lock-color/)~~
+
+Unfortunately the previous maintainer left, and the package got dumped back into the AUR where I'm now maintaining it. I'm looking for a TU to sponsor it back into Community, but for now, get it on AUR:
+
+[Release Version on AUR](https://aur.archlinux.org/packages/i3lock-color/)
 
 [Git Version on AUR](https://aur.archlinux.org/packages/i3lock-color-git/)
 
