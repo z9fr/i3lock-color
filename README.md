@@ -122,13 +122,11 @@ You may choose to modify the script based on your needs/OS/distro.
 ~~[Stable version in Community](https://www.archlinux.org/packages/community/x86_64/i3lock-color/)~~
 
 Unfortunately the previous maintainer left, and the package got dumped back into the AUR where I'm now maintaining it. I'm looking for a TU to sponsor it back into Community, but for now, get it on AUR:
+- [Release Version on AUR](https://aur.archlinux.org/packages/i3lock-color/)
+- [Git Version on AUR](https://aur.archlinux.org/packages/i3lock-color-git/)
 
 ## Gentoo Package
 i3lock-color is available on **GURU**, under `x11-misc/i3lock-color` (https://github.com/gentoo/guru/tree/master/x11-misc/i3lock-color).
-
-[Release Version on AUR](https://aur.archlinux.org/packages/i3lock-color/)
-
-[Git Version on AUR](https://aur.archlinux.org/packages/i3lock-color-git/)
 
 ## FreeBSD port
 [i3lock-color-port](https://github.com/rkashapov/i3lock-color-port/)
