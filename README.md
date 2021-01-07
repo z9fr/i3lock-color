@@ -18,7 +18,7 @@
 ![GitHub forks](https://img.shields.io/github/forks/Raymo111/i3lock-color)
 ![GitHub stars](https://img.shields.io/github/stars/Raymo111/i3lock-color)
 ![GitHub watchers](https://img.shields.io/github/watchers/Raymo111/i3lock-color)
-![Maintenance](https://img.shields.io/maintenance/yes/2020)
+![Maintenance](https://img.shields.io/maintenance/yes)
 
 ### The world's most popular non-default computer lockscreen.
 **A modern version of i3lock with color functionality and other features.**
