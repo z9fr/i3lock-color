@@ -85,7 +85,7 @@ if [[ -f /etc/arch-release ]]; then
 fi
 
 # Use system-auth instead of login on Gentoo
-if [[ -f /etc/arch-release ]]; then
+if [[ -f /etc/gentoo-release ]]; then
     echo "Using PAM for Gentoo"
     sed -i "s/^#auth include system-auth/auth include system-auth/g" ../pam/i3lock
     sed -i "s/^auth include login/#auth include login/g" ../pam/i3lock
