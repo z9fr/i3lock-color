@@ -97,11 +97,13 @@ sudo apt install autoconf gcc make pkg-config libpam0g-dev libcairo2-dev libfont
 ## Building i3lock-color
 Before you build - check and see if there's a packaged version available for your distro (there usually is, either in a community repo/PPA).
 
-If there's no packaged version available - think carefully, since you're using a forked screen locker at your own risk.
+**If you want to build a non-debug version, you should tag your build before configuring.**
 
-**If you want to build a non-debug version, you should tag your build before configuring.** For example: `git tag -f "git-$(git rev-parse --short HEAD)"` will add a tag with the short commit ID, which will be used for the version info. Issues asking about ASAN/complaints about i3lock-color being slow / etc will likely be closed. i3lock-color uses GNU autotools for building.
+For example: `git tag -f "git-$(git rev-parse --short HEAD)"` will add a tag with the short commit ID, which will be used for the version info.
 
-To use i3lock-color, first install the dependencies listed above, then clone the repo:
+i3lock-color uses GNU autotools for building.
+
+To build/install i3lock-color, first install the dependencies listed above, then clone the repo:
 ```
 git clone https://github.com/Raymo111/i3lock-color.git
 cd i3lock-color
@@ -111,7 +113,7 @@ To build without installing, run:
 chmod +x build.sh
 ./build.sh
 ```
-To install after building, run:
+To build AND install, run:
 ```
 chmod +x install-i3lock-color.sh
 ./install-i3lock-color.sh
