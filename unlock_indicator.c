@@ -319,8 +319,7 @@ static void draw_single_bar(cairo_t *ctx, double pos, double offset, double widt
     if (bar_reversed) {
         offset -= height;
     } else if (bar_bidirectional) {
-        offset -= height;
-        height *= 2;
+        offset -= height / 2;
     }
 
     if (bar_orientation == BAR_VERT)
@@ -331,6 +330,8 @@ static void draw_single_bar(cairo_t *ctx, double pos, double offset, double widt
 }
 
 static void draw_bar(cairo_t *ctx, double bar_offset, double screen_x, double screen_y, double screen_w, double screen_h) {
+
+    cairo_save(ctx);
 
     switch (auth_state) {
         case STATE_AUTH_VERIFY:
@@ -356,6 +357,8 @@ static void draw_bar(cairo_t *ctx, double bar_offset, double screen_x, double sc
     else
         cairo_set_source_rgba(ctx, keyhl16.red, keyhl16.green, keyhl16.blue, keyhl16.alpha);
 
+    cairo_set_operator(ctx, CAIRO_OPERATOR_SOURCE);
+
     double bar_width, screen_pos;
     if (bar_orientation == BAR_VERT) {
         bar_width = screen_h / bar_count;
@@ -367,6 +370,7 @@ static void draw_bar(cairo_t *ctx, double bar_offset, double screen_x, double sc
 
     for (int i = 0; i < bar_count; ++i) {
         double bar_height = bar_heights[i];
+        if (bar_bidirectional) bar_height *= 2;
         if (bar_height > 0) {
             draw_single_bar(ctx, screen_pos + i * bar_width, bar_offset, bar_width, bar_height);
         }
@@ -377,6 +381,8 @@ static void draw_bar(cairo_t *ctx, double bar_offset, double screen_x, double sc
             bar_heights[i] -= bar_periodic_step;
         }
     }
+
+    cairo_restore(ctx);
 }
 
 static void draw_indic(cairo_t *ctx, double ind_x, double ind_y) {
