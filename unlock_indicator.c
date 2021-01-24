@@ -367,7 +367,9 @@ static void draw_bar(cairo_t *ctx, double bar_offset, double screen_x, double sc
 
     for (int i = 0; i < bar_count; ++i) {
         double bar_height = bar_heights[i];
-        draw_single_bar(ctx, screen_pos + i * bar_width, bar_offset, bar_width, bar_height);
+        if (bar_height > 0) {
+            draw_single_bar(ctx, screen_pos + i * bar_width, bar_offset, bar_width, bar_height);
+        }
     }
 
     for (int i = 0; i < bar_count; ++i) {
