@@ -2008,7 +2008,6 @@ int main(int argc, char *argv[]) {
             case 702:
                 bar_width = atoi(optarg);
                 if (bar_width < 1) bar_width = 150;
-                // bar_count and bar_heights* initialized later when we grab display info
                 break;
             case 703:
                 arg = optarg;
@@ -2053,6 +2052,7 @@ int main(int argc, char *argv[]) {
             case 710:
                 bar_count = atoi(optarg);
                 if (bar_count > BAR_MAX_COUNT) bar_count = BAR_MAX_COUNT;
+                if (bar_count < 1) bar_count = 10;
                 break;
 
 			// Misc
@@ -2200,18 +2200,20 @@ int main(int argc, char *argv[]) {
     last_resolution[0] = screen->width_in_pixels;
     last_resolution[1] = screen->height_in_pixels;
 
-    if (bar_width > 0) {
-        fprintf(stderr, "Warning: --bar-width is deprecated, use --bar-count instead\n");
-        if (bar_orientation == BAR_VERT)
-            bar_count = screen->height_in_pixels / bar_width;
-        else
-            bar_count = screen->width_in_pixels / bar_width;
-    }
+    if (bar_enabled) {
+        if (bar_width > 0) {
+            fprintf(stderr, "Warning: --bar-width is deprecated, use --bar-count instead\n");
+            int tmp = screen->width_in_pixels;
+            if (bar_orientation == BAR_VERT) tmp = screen->height_in_pixels;
+            bar_count = tmp / bar_width;
+            if (tmp % bar_width != 0) ++bar_count;
+        }
 
-    if (bar_enabled && bar_count > 0) {
-        bar_heights = (double*) calloc(bar_count, sizeof(double));
-    } else {
-        bar_enabled = false;
+        if (bar_count > 0) {
+            bar_heights = (double*) calloc(bar_count, sizeof(double));
+        } else {
+            bar_enabled = false;
+        }
     }
 
     xcb_change_window_attributes(conn, screen->root, XCB_CW_EVENT_MASK,
