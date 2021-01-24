@@ -396,6 +396,8 @@ Sets the direction the bars grow in. 0 is the default (downwards, or rightwards,
 
 .TP
 .B \-\-bar\-width=15
+Deprecated, use \-\-bar\-count instead.
+
 Sets the width of the minibars in the bar.
 
 .TP
@@ -429,6 +431,10 @@ The value by which the bars decrease each time the screen is redrawn.
 .B \-\-bar\-position
 Works similarly to the time/date/indicator expressions. If the bar is horizontal, this sets the vertical offset from the top edge.
 If it's vertically oriented, this sets the horizontal offset from the left edge.
+
+.TP
+.B \-\-bar\-count=10
+Sets the number of minibars to draw on each screen.
 
 .TP
 .B \-\-no\-verify
