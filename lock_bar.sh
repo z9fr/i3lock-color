@@ -10,7 +10,7 @@ V='#bb00bbbb'  # verifying
 ./x86_64-pc-linux-gnu/i3lock \
 --blur 5 \
 --bar-indicator \
---bar-position h \
+--bar-position y+h \
 --bar-direction 1 \
 --bar-max-height 50 \
 --bar-base-width 50 \
@@ -18,12 +18,11 @@ V='#bb00bbbb'  # verifying
 --keyhlcolor 880088cc \
 --bar-periodic-step 50 \
 --bar-step 50 \
---bar-width 250 \
 --redraw-thread \
 \
 --clock \
 --force-clock \
---timepos 5:h-80 \
+--timepos x+5:y+h-80 \
 --timecolor 880088ff \
 --datepos tx:ty+15 \
 --datecolor 990099ff \
@@ -31,11 +30,9 @@ V='#bb00bbbb'  # verifying
 --time-align 1 \
 --ringvercolor 8800ff88 \
 --ringwrongcolor ff008888 \
---statuspos 5:h-16 \
+--statuspos x+5:y+h-16 \
 --verif-align 1 \
 --wrong-align 1 \
 --verifcolor ffffffff \
 --wrongcolor ffffffff \
---modifpos -50:-50 \
-\
---screen 1
+--modifpos -50:-50

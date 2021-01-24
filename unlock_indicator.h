@@ -34,7 +34,7 @@ typedef struct {
 
     double indicator_x, indicator_y;
 
-    double bar_x, bar_y;
+    double screen_x, screen_y, screen_w, screen_h;
     double bar_offset;
 } DrawData;
 
