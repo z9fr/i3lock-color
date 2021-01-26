@@ -19,10 +19,12 @@ typedef struct text {
 
     char str[512];
     double size;
+    double outline_width;
 
     cairo_font_face_t *font;
 
     rgba_t color;
+    rgba_t outline_color;
     double x, y;
 
     int align;
