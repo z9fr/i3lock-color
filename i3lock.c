@@ -2138,11 +2138,11 @@ int main(int argc, char *argv[]) {
             case 710:
                 bar_count = atoi(optarg);
                 if (bar_count > BAR_MAX_COUNT) {
-					bar_count = BAR_MAX_COUNT;
-				}
+                    bar_count = BAR_MAX_COUNT;
+                }
                 if (bar_count < BAR_MIN_COUNT) {
-					bar_count = BAR_MIN_COUNT;
-				}
+                    bar_count = BAR_MIN_COUNT;
+                }
                 break;
 
 			// Misc
