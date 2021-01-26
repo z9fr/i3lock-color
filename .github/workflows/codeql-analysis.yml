@@ -21,7 +21,7 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix:
+      # matrix:
         # Override automatic language detection by changing the below list
         # Supported options are ['csharp', 'cpp', 'go', 'java', 'javascript', 'python']
         # language: ['cpp']
