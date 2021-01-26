@@ -262,13 +262,14 @@ pthread_t draw_thread;
 // allow you to disable. handy if you use bar with lots of crap.
 bool redraw_thread = false;
 
+// experimental bar stuff
 #define BAR_VERT 0
 #define BAR_FLAT 1
 #define BAR_DEFAULT 0
 #define BAR_REVERSED 1
 #define BAR_BIDIRECTIONAL 2
-#define BAR_MAX_COUNT 65536
-// experimental bar stuff
+#define BAR_MAX_COUNT 65535
+
 bool bar_enabled = false;
 double *bar_heights = NULL;
 double bar_step = 15;
