@@ -269,6 +269,7 @@ bool redraw_thread = false;
 #define BAR_REVERSED 1
 #define BAR_BIDIRECTIONAL 2
 #define BAR_MAX_COUNT 65535
+#define BAR_MIN_COUNT 2
 
 bool bar_enabled = false;
 double *bar_heights = NULL;
@@ -276,7 +277,7 @@ double bar_step = 15;
 double bar_base_height = 25;
 double bar_periodic_step = 15;
 double max_bar_height = 25;
-int bar_count = 10;
+int bar_count = BAR_MIN_COUNT;
 int bar_width = 0;
 int bar_orientation = BAR_FLAT;
 
@@ -2136,8 +2137,12 @@ int main(int argc, char *argv[]) {
                 break;
             case 710:
                 bar_count = atoi(optarg);
-                if (bar_count > BAR_MAX_COUNT) bar_count = BAR_MAX_COUNT;
-                if (bar_count < 1) bar_count = 10;
+                if (bar_count > BAR_MAX_COUNT) {
+					bar_count = BAR_MAX_COUNT;
+				}
+                if (bar_count < BAR_MIN_COUNT) {
+					bar_count = BAR_MIN_COUNT;
+				}
                 break;
 
 			// Misc
