@@ -277,7 +277,7 @@ double bar_step = 15;
 double bar_base_height = 25;
 double bar_periodic_step = 15;
 double max_bar_height = 25;
-int bar_count = MIN_BAR_COUNT;
+int bar_count = 0;
 int bar_width = 0;
 int bar_orientation = BAR_FLAT;
 
@@ -2288,19 +2288,27 @@ int main(int argc, char *argv[]) {
     last_resolution[1] = screen->height_in_pixels;
 
     if (bar_enabled) {
-        if (bar_width > 0) {
-            fprintf(stderr, "Warning: --bar-width is deprecated, use --bar-count instead\n");
-            int tmp = screen->width_in_pixels;
-            if (bar_orientation == BAR_VERT) tmp = screen->height_in_pixels;
-            bar_count = tmp / bar_width;
-            if (tmp % bar_width != 0) {
-                ++bar_count;
+        if (bar_count == 0) {
+            if (bar_width != 0) {
+                fprintf(stderr, "Warning: bar-width is deprecated, use bar-count instead\n");
+                int tmp = screen->width_in_pixels;
+                if (bar_orientation == BAR_VERT) tmp = screen->height_in_pixels;
+                bar_count = tmp / bar_width;
+                if (tmp % bar_width != 0) {
+                    ++bar_count;
+                }
+            } else {
+                bar_count = 10;
             }
-            if (bar_count < MIN_BAR_COUNT) {
-                bar_enabled = false;
-            }
+        } else if (bar_width != 0) {
+            errx(EXIT_FAILURE, "bar-width and bar-count cannot be used at the same time");
         }
-        bar_heights = (double*) calloc(bar_count, sizeof(double));
+
+        if (bar_count >= MIN_BAR_COUNT && bar_count <= MAX_BAR_COUNT) {
+            bar_heights = (double*) calloc(bar_count, sizeof(double));
+        } else {
+            bar_enabled = false;
+        }
     }
 
     xcb_change_window_attributes(conn, screen->root, XCB_CW_EVENT_MASK,
