@@ -268,8 +268,6 @@ bool redraw_thread = false;
 #define BAR_DEFAULT 0
 #define BAR_REVERSED 1
 #define BAR_BIDIRECTIONAL 2
-#define BAR_MAX_COUNT 65535
-#define BAR_MIN_COUNT 2
 
 bool bar_enabled = false;
 double *bar_heights = NULL;
@@ -277,7 +275,9 @@ double bar_step = 15;
 double bar_base_height = 25;
 double bar_periodic_step = 15;
 double max_bar_height = 25;
-int bar_count = BAR_MIN_COUNT;
+int max_bar_count = 65535;
+int min_bar_count = 1;
+int bar_count = min_bar_count;
 int bar_width = 0;
 int bar_orientation = BAR_FLAT;
 
@@ -2137,11 +2137,8 @@ int main(int argc, char *argv[]) {
                 break;
             case 710:
                 bar_count = atoi(optarg);
-                if (bar_count > BAR_MAX_COUNT) {
-                    bar_count = BAR_MAX_COUNT;
-                }
-                if (bar_count < BAR_MIN_COUNT) {
-                    bar_count = BAR_MIN_COUNT;
+                if (bar_count > max_bar_count || bar_count < min_bar_count) {
+                    errx(1, "bar-count must be between %d and %d\n", min_bar_count, max_bar_count);
                 }
                 break;
 
@@ -2296,14 +2293,14 @@ int main(int argc, char *argv[]) {
             int tmp = screen->width_in_pixels;
             if (bar_orientation == BAR_VERT) tmp = screen->height_in_pixels;
             bar_count = tmp / bar_width;
-            if (tmp % bar_width != 0) ++bar_count;
+            if (tmp % bar_width != 0) {
+                ++bar_count;
+            }
+            if (bar_count < min_bar_count) {
+                bar_enabled = false;
+            }
         }
-
-        if (bar_count > 0) {
-            bar_heights = (double*) calloc(bar_count, sizeof(double));
-        } else {
-            bar_enabled = false;
-        }
+        bar_heights = (double*) calloc(bar_count, sizeof(double));
     }
 
     xcb_change_window_attributes(conn, screen->root, XCB_CW_EVENT_MASK,
