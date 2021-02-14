@@ -1,8 +1,8 @@
 #                                               -*- Autoconf -*-
 # Run autoreconf -fi to generate a configure script from this file.
 
-AC_PREREQ([2.69])
-AC_INIT([i3lock-color], [m4_esyscmd_s([cat I3LOCK_VERSION])], [https://github.com/Raymo11/i3lock-color/issues])
+AC_PREREQ([2.70])
+AC_INIT([i3lock-color],[m4_esyscmd_s([cat I3LOCK_VERSION])],[https://github.com/Raymo11/i3lock-color/issues])
 # For AX_EXTEND_SRCDIR
 AX_ENABLE_BUILDDIR
 AM_INIT_AUTOMAKE([foreign subdir-objects -Wall no-dist-gzip dist-bzip2])
@@ -50,7 +50,7 @@ dnl is_release must be lowercase because AX_CHECK_ENABLE_DEBUG calls m4_tolower
 dnl on its fourth argument.
 AX_CHECK_ENABLE_DEBUG([yes], , [UNUSED_NDEBUG], [$is_release])
 
-AC_PROG_CC_C99
+AC_REQUIRE(AC_PROG_CC)
 
 # For strnlen() and vasprintf().
 AC_USE_SYSTEM_EXTENSIONS
