@@ -23,7 +23,7 @@
 ### The world's most popular non-default computer lockscreen.
 **A modern version of i3lock with color functionality and other features.**
 
-![i3lock-color in action](screenshot.png "Screenshot sample")
+![i3lock-color in action](examples/screenshot.png "Screenshot sample")
 
 i3lock is a simple screen locker like slock. After starting it, you will see a white screen (you can configure the color/an image). You can return to your screen by entering your password.
 

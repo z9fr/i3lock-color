@@ -32,4 +32,3 @@ Makefile.in
 /missing
 /stamp-h1
 *.in~
-pam/i3lock

@@ -7,7 +7,7 @@ T='#ee00eeee'  # text
 W='#880000bb'  # wrong
 V='#bb00bbbb'  # verifying
 
-./x86_64-pc-linux-gnu/i3lock \
+i3lock \
 --insidevercolor=$C   \
 --ringvercolor=$V     \
 \
@@ -34,11 +34,3 @@ V='#bb00bbbb'  # verifying
 --timestr="%H:%M:%S"  \
 --datestr="%A, %m %Y" \
 --keylayout 1         \
-
-# --veriftext="Drinking verification can..."
-# --wrongtext="Nope!"
-# --textsize=20
-# --modsize=10
-# --timefont=comic-sans
-# --datefont=monofur
-# etc
