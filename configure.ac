@@ -77,17 +77,17 @@ AC_SEARCH_LIBS([ev_run], [ev], , [AC_MSG_FAILURE([cannot find the required ev_ru
 
 AC_SEARCH_LIBS([shm_open], [rt])
 
-# Use system-auth instead of login on Arch
+# Use system-local-login instead of login on Arch
 if [[ -f /etc/arch-release ]]; then
     echo "Using PAM for Arch"
-    sed -i "s/^#auth include system-auth/auth include system-auth/g" ../pam/i3lock
+    sed -i "s/^#auth include system-local-login/auth include system-local-login/g" ../pam/i3lock
     sed -i "s/^auth include login/#auth include login/g" ../pam/i3lock
 fi
 
-# Use system-auth instead of login on Gentoo
+# Use system-local-login instead of login on Gentoo
 if [[ -f /etc/gentoo-release ]]; then
     echo "Using PAM for Gentoo"
-    sed -i "s/^#auth include system-auth/auth include system-auth/g" ../pam/i3lock
+    sed -i "s/^#auth include system-local-login/auth include system-local-login/g" ../pam/i3lock
     sed -i "s/^auth include login/#auth include login/g" ../pam/i3lock
 fi
 
