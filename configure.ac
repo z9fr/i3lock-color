@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Run autoreconf -fi to generate a configure script from this file.
 
-AC_PREREQ([2.70])
+AC_PREREQ([2.69])
 AC_INIT([i3lock-color],[m4_esyscmd_s([cat I3LOCK_VERSION])],[https://github.com/Raymo11/i3lock-color/issues])
 # For AX_EXTEND_SRCDIR
 AX_ENABLE_BUILDDIR
