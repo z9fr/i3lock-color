@@ -1,14 +1,14 @@
 # i3lock-color
 
 ![Language count](https://img.shields.io/github/languages/count/Raymo111/i3lock-color)
-![Top language](https://img.shields.io/github/languages/top/Raymo111/i3lock-color)
+[![Top language](https://img.shields.io/github/languages/top/Raymo111/i3lock-color)](https://github.com/Raymo111/i3lock-color/search?l=c)
 ![Repo size](https://img.shields.io/github/repo-size/Raymo111/i3lock-color)
-![Open issues](https://img.shields.io/github/issues-raw/Raymo111/i3lock-color)
-![Closed issues](https://img.shields.io/github/issues-closed-raw/Raymo111/i3lock-color?color=brightgreen)
-![Open PRs](https://img.shields.io/github/issues-pr-raw/Raymo111/i3lock-color?label=open%20PRs)
-![Closed PRs](https://img.shields.io/github/issues-pr-closed-raw/Raymo111/i3lock-color?color=brightgreen&label=closed%20PRs)
-![Contributor count](https://img.shields.io/github/contributors/Raymo111/i3lock-color)
-![GitHub Release Date](https://img.shields.io/github/release-date/Raymo111/i3lock-color?label=latest%20release)
+[![Open issues](https://img.shields.io/github/issues-raw/Raymo111/i3lock-color)](https://github.com/Raymo111/i3lock-color/issues?q=is%3Aopen+is%3Aissue)
+[![Closed issues](https://img.shields.io/github/issues-closed-raw/Raymo111/i3lock-color?color=brightgreen)](https://github.com/Raymo111/i3lock-color/issues?q=is%3Aissue+is%3Aclosed)
+[![Open PRs](https://img.shields.io/github/issues-pr-raw/Raymo111/i3lock-color?label=open%20PRs)](https://github.com/Raymo111/i3lock-color/pulls?q=is%3Aopen+is%3Apr)
+[![Closed PRs](https://img.shields.io/github/issues-pr-closed-raw/Raymo111/i3lock-color?color=brightgreen&label=closed%20PRs)](https://github.com/Raymo111/i3lock-color/pulls?q=is%3Apr+is%3Aclosed)
+[![Contributors](https://img.shields.io/github/contributors/Raymo111/i3lock-color)](https://github.com/Raymo111/i3lock-color/graphs/contributors)
+[![Latest release](https://img.shields.io/github/release-date/Raymo111/i3lock-color?label=latest%20release)](https://github.com/Raymo111/i3lock-color/releases/latest)
 [![Commits](https://img.shields.io/github/commits-since/Raymo111/i3lock-color/latest?include_prereleases&sort=semver)](https://github.com/Raymo111/i3lock-color/commits/master)
 ![Latest commit](https://img.shields.io/github/last-commit/Raymo111/i3lock-color)
 <!--![Arch Linux package](https://img.shields.io/archlinux/v/community/x86_64/i3lock-color?logo=arch%20linux&label=Community%20version)-->
