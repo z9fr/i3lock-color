@@ -47,15 +47,18 @@ You can also specify additional options, as detailed in the manpage. This includ
 	- Key highlight color
 	- Backspace highlight color
 	- Text colors for most/all strings
+	- Outline colors
 	- Changing all of the above depending on PAM's authentication status
 - Blurring the current screen and using that as the lock background    
 - Showing a clock in the indicator
 - Refreshing on a timer, instead of on each keypress
 - Positioning the various UI elements
 - Changing the ring radius and thickness, as well as text size
-- Passthrough media keys
+- Options for passwordless auth, removing modkey indicator
+- Passing through media keys
 - A new bar indicator, which replaces the ring indicator with its own set of options
 	- An experimental thread for driving the redraw ticks, so that things like the bar/clock still update when PAM is blocking
+- Any other feature you want (add it yourself through a PR or make a feature request issue!)
 
 ## Dependencies
 The following dependencies will need to be installed for a successful build, depending on your OS/distro.
