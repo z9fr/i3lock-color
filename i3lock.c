@@ -269,7 +269,7 @@ bool redraw_thread = false;
 #define BAR_REVERSED 1
 #define BAR_BIDIRECTIONAL 2
 #define MAX_BAR_COUNT 65535
-#define MIN_BAR_COUNT 1
+#define MIN_BAR_COUNT 2
 
 bool bar_enabled = false;
 double *bar_heights = NULL;
@@ -2298,7 +2298,7 @@ int main(int argc, char *argv[]) {
                     ++bar_count;
                 }
             } else {
-                bar_count = 10;
+                bar_count = MIN_BAR_COUNT;
             }
         } else if (bar_width != 0) {
             errx(EXIT_FAILURE, "bar-width and bar-count cannot be used at the same time");
