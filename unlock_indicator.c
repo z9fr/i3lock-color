@@ -228,8 +228,7 @@ extern double bar_base_height;
 extern double bar_periodic_step;
 extern double max_bar_height;
 extern double bar_position;
-extern int num_bars;
-extern int bar_width;
+extern int bar_count;
 extern int bar_orientation;
 
 extern char bar_base_color[9];
@@ -342,119 +341,74 @@ static void draw_text(cairo_t *ctx, text_t text) {
     cairo_stroke(ctx);
 }
 
-static void draw_bar(cairo_t *ctx, double x, double y, double bar_offset) {
-    // oh boy, here we go!
-    // TODO: get this to play nicely with multiple monitors
-    // ideally it'd intelligently span both monitors
-    double width, height;
-    double back_x = 0, back_y = 0, back_x2 = 0, back_y2 = 0, back_width = 0, back_height = 0;
-    for (int i = 0; i < num_bars; ++i) {
-        double cur_bar_height = bar_heights[i];
+static void draw_single_bar(cairo_t *ctx, double pos, double offset, double width, double height) {
+    if (bar_reversed) {
+        offset -= height;
+    } else if (bar_bidirectional) {
+        offset -= height / 2;
+    }
 
-        if (cur_bar_height > 0) {
-            if (unlock_state == STATE_BACKSPACE_ACTIVE) {
-                cairo_set_source_rgba(ctx, bshl16.red, bshl16.green, bshl16.blue, bshl16.alpha);
-            } else {
-                cairo_set_source_rgba(ctx, keyhl16.red, keyhl16.green, keyhl16.blue, keyhl16.alpha);
-            }
-        } else {
-            switch (auth_state) {
-                case STATE_AUTH_VERIFY:
-                case STATE_AUTH_LOCK:
-                    cairo_set_source_rgba(ctx, ringver16.red, ringver16.green, ringver16.blue, ringver16.alpha);
-                    break;
-                case STATE_AUTH_WRONG:
-                case STATE_I3LOCK_LOCK_FAILED:
-                    cairo_set_source_rgba(ctx, ringwrong16.red, ringwrong16.green, ringwrong16.blue, ringwrong16.alpha);
-                    break;
-                default:
-                    cairo_set_source_rgba(ctx, bar16.red, bar16.green, bar16.blue, bar16.alpha);
-                    break;
-            }
-        }
+    if (bar_orientation == BAR_VERT)
+        cairo_rectangle(ctx, offset, pos, height, width);
+    else
+        cairo_rectangle(ctx, pos, offset, width, height);
+    cairo_fill(ctx);
+}
 
-        if (bar_orientation == BAR_VERT) {
-            width = (cur_bar_height <= 0 ? bar_base_height : cur_bar_height);
-            height = bar_width;
-            x = bar_offset;
-            y = i * bar_width;
-            if (bar_reversed) {
-                x -= width;
-            } else if (bar_bidirectional) {
-                width = (cur_bar_height <= 0 ? bar_base_height : cur_bar_height * 2);
-                x = bar_offset - (width / 2) + (bar_base_height / 2);
-            }
-        } else {
-            width = bar_width;
-            height = (cur_bar_height <= 0 ? bar_base_height : cur_bar_height);
-            x = i * bar_width;
-            y = bar_offset;
-            if (bar_reversed) {
-                y -= height;
-            } else if (bar_bidirectional) {
-                height = (cur_bar_height <= 0 ? bar_base_height : cur_bar_height * 2);
-                y = bar_offset - (height / 2) + (bar_base_height / 2);
-            }
-        }
+static void draw_bar(cairo_t *ctx, double bar_offset, double screen_x, double screen_y, double screen_w, double screen_h) {
 
-        if (cur_bar_height < bar_base_height && cur_bar_height > 0) {
-            if (bar_orientation == BAR_VERT) {
-                back_x = bar_offset + cur_bar_height;
-                back_y = y;
-                back_width = bar_base_height - cur_bar_height;
-                back_height = height;
-                if (bar_reversed) {
-                    back_x = bar_offset - bar_base_height;
-                } else if (bar_bidirectional) {
-                    back_x = bar_offset;
-                    back_y2 = y;
-                    back_width = (bar_base_height - (cur_bar_height * 2)) / 2;
-                    back_x2 = bar_offset + (cur_bar_height * 2) + back_width;
-                }
-            } else {
-                back_x = x;
-                back_y = bar_offset + cur_bar_height;
-                back_width = width;
-                back_height = bar_base_height - cur_bar_height;
-                if (bar_reversed) {
-                    back_y = bar_offset - bar_base_height;
-                } else if (bar_bidirectional) {
-                    back_x2 = x;
-                    back_y = bar_offset;
-                    back_height = (bar_base_height - (cur_bar_height * 2)) / 2;
-                    back_y2 = bar_offset + (cur_bar_height * 2) + back_height;
-                }
-            }
-        }
-        cairo_rectangle(ctx, x, y, width, height);
-        cairo_fill(ctx);
-        switch (auth_state) {
-            case STATE_AUTH_VERIFY:
-            case STATE_AUTH_LOCK:
-                cairo_set_source_rgba(ctx, ringver16.red, ringver16.green, ringver16.blue, ringver16.alpha);
-                break;
-            case STATE_AUTH_WRONG:
-            case STATE_I3LOCK_LOCK_FAILED:
-                cairo_set_source_rgba(ctx, ringwrong16.red, ringwrong16.green, ringwrong16.blue, ringwrong16.alpha);
-                break;
-            default:
-                cairo_set_source_rgba(ctx, bar16.red, bar16.green, bar16.blue, bar16.alpha);
-                break;
-        }
+    cairo_save(ctx);
 
-        if (cur_bar_height > 0 && cur_bar_height < bar_base_height && ((bar_bidirectional && ((cur_bar_height * 2) < bar_base_height)) || (!bar_bidirectional && (cur_bar_height < bar_base_height)))) {
-            cairo_rectangle(ctx, back_x, back_y, back_width, back_height);
-            cairo_fill(ctx);
-            if (bar_bidirectional) {
-                cairo_rectangle(ctx, back_x2, back_y2, back_width, back_height);
-                cairo_fill(ctx);
-            }
+    switch (auth_state) {
+        case STATE_AUTH_VERIFY:
+        case STATE_AUTH_LOCK:
+            cairo_set_source_rgba(ctx, ringver16.red, ringver16.green, ringver16.blue, ringver16.alpha);
+            break;
+        case STATE_AUTH_WRONG:
+        case STATE_I3LOCK_LOCK_FAILED:
+            cairo_set_source_rgba(ctx, ringwrong16.red, ringwrong16.green, ringwrong16.blue, ringwrong16.alpha);
+            break;
+        default:
+            cairo_set_source_rgba(ctx, bar16.red, bar16.green, bar16.blue, bar16.alpha);
+            break;
+    }
+
+    if (bar_orientation == BAR_VERT)
+        draw_single_bar(ctx, screen_y, bar_offset, screen_h, bar_base_height);
+    else
+        draw_single_bar(ctx, screen_x, bar_offset, screen_w, bar_base_height);
+
+    if (unlock_state == STATE_BACKSPACE_ACTIVE)
+        cairo_set_source_rgba(ctx, bshl16.red, bshl16.green, bshl16.blue, bshl16.alpha);
+    else
+        cairo_set_source_rgba(ctx, keyhl16.red, keyhl16.green, keyhl16.blue, keyhl16.alpha);
+
+    cairo_set_operator(ctx, CAIRO_OPERATOR_SOURCE);
+
+    double bar_width, screen_pos;
+    if (bar_orientation == BAR_VERT) {
+        bar_width = screen_h / bar_count;
+        screen_pos = screen_y;
+    } else {
+        bar_width = screen_w / bar_count;
+        screen_pos = screen_x;
+    }
+
+    for (int i = 0; i < bar_count; ++i) {
+        double bar_height = bar_heights[i];
+        if (bar_bidirectional) bar_height *= 2;
+        if (bar_height > 0) {
+            draw_single_bar(ctx, screen_pos + i * bar_width, bar_offset, bar_width, bar_height);
         }
     }
-    for (int i = 0; i < num_bars; ++i) {
-        if (bar_heights[i] > 0)
+
+    for (int i = 0; i < bar_count; ++i) {
+        if (bar_heights[i] > 0) {
             bar_heights[i] -= bar_periodic_step;
+        }
     }
+
+    cairo_restore(ctx);
 }
 
 static void draw_indic(cairo_t *ctx, double ind_x, double ind_y) {
@@ -663,15 +617,15 @@ static void draw_elements(cairo_t *const ctx, DrawData const *const draw_data) {
         if (unlock_state == STATE_KEY_ACTIVE ||
             unlock_state == STATE_BACKSPACE_ACTIVE) {
             // note: might be biased to cause more hits on lower indices
-            // maybe see about doing ((double) rand() / RAND_MAX) * num_bars
-            int index = rand() % num_bars;
+            // maybe see about doing ((double) rand() / RAND_MAX) * bar_count
+            int index = rand() % bar_count;
             bar_heights[index] = max_bar_height;
             for (int i = 0; i < ((max_bar_height / bar_step) + 1); ++i) {
                 int low_ind = index - i;
                 while (low_ind < 0) {
-                    low_ind += num_bars;
+                    low_ind += bar_count;
                 }
-                int high_ind = (index + i) % num_bars;
+                int high_ind = (index + i) % bar_count;
                 int tmp_height = max_bar_height - (bar_step * i);
                 if (tmp_height < 0)
                     tmp_height = 0;
@@ -683,7 +637,7 @@ static void draw_elements(cairo_t *const ctx, DrawData const *const draw_data) {
                     break;
             }
         }
-        draw_bar(ctx, draw_data->bar_x, draw_data->bar_y, draw_data->bar_offset);
+        draw_bar(ctx, draw_data->bar_offset, draw_data->screen_x, draw_data->screen_y, draw_data->screen_w, draw_data->screen_h);
     }
 
     draw_text(ctx, draw_data->status_text);
@@ -971,6 +925,10 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
             height = xr_resolutions[current_screen].height / scaling_factor;
             screen_x = xr_resolutions[current_screen].x / scaling_factor;
             screen_y = xr_resolutions[current_screen].y / scaling_factor;
+            draw_data.screen_w = width;
+            draw_data.screen_h = height;
+            draw_data.screen_x = screen_x;
+            draw_data.screen_y = screen_y;
             if (te_ind_x_expr && te_ind_y_expr) {
                 draw_data.indicator_x = te_eval(te_ind_x_expr);
                 draw_data.indicator_y = te_eval(te_ind_y_expr);
@@ -978,8 +936,6 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
                 draw_data.indicator_x = screen_x + width / 2;
                 draw_data.indicator_y = screen_y + height / 2;
             }
-            draw_data.bar_x = draw_data.indicator_x - (button_diameter_physical / 2);
-            draw_data.bar_y = draw_data.indicator_y - (button_diameter_physical / 2);
             draw_data.bar_offset = te_eval(te_bar_expr);
             draw_data.time_text.x = te_eval(te_time_x_expr);
             draw_data.time_text.y = te_eval(te_time_y_expr);
@@ -1011,7 +967,7 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
             draw_data.mod_text.y = te_eval(te_modif_y_expr);
 
             DEBUG("Indicator at %fx%f on screen %d\n", draw_data.indicator_x, draw_data.indicator_y, current_screen + 1);
-            DEBUG("Bar at %fx%f on screen %d\n", draw_data.bar_x, draw_data.bar_y, current_screen + 1);
+            DEBUG("Bar at %f on screen %d\n", draw_data.bar_offset, current_screen + 1);
             DEBUG("Time at %fx%f on screen %d\n", draw_data.time_text.x, draw_data.time_text.y, current_screen + 1);
             DEBUG("Date at %fx%f on screen %d\n", draw_data.date_text.x, draw_data.date_text.y, current_screen + 1);
             DEBUG("Layout at %fx%f on screen %d\n", draw_data.keylayout_text.x, draw_data.keylayout_text.y, current_screen + 1);
@@ -1026,10 +982,12 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
          * hope for the best. */
         width = last_resolution[0] / scaling_factor;
         height = last_resolution[1] / scaling_factor;
+        draw_data.screen_w = width;
+        draw_data.screen_h = height;
+        draw_data.screen_x = 0;
+        draw_data.screen_y = 0;
         draw_data.indicator_x = width / 2;
         draw_data.indicator_y = height / 2;
-        draw_data.bar_x = draw_data.indicator_x - (button_diameter_physical / 2);
-        draw_data.bar_y = draw_data.indicator_y - (button_diameter_physical / 2);
 
         draw_data.time_text.x = te_eval(te_time_x_expr);
         draw_data.time_text.y = te_eval(te_time_y_expr);
@@ -1059,7 +1017,7 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
         draw_data.mod_text.y = te_eval(te_modif_y_expr);
 
         DEBUG("Indicator at %fx%f\n", draw_data.indicator_x, draw_data.indicator_y);
-        DEBUG("Bar at %fx%f\n", draw_data.bar_x, draw_data.bar_y);
+        DEBUG("Bar at %f\n", draw_data.bar_offset);
         DEBUG("Time at %fx%f\n", draw_data.time_text.x, draw_data.time_text.y);
         DEBUG("Date at %fx%f\n", draw_data.date_text.x, draw_data.date_text.y);
         DEBUG("Layout at %fx%f\n", draw_data.keylayout_text.x, draw_data.keylayout_text.y);

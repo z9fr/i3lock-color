@@ -262,20 +262,23 @@ pthread_t draw_thread;
 // allow you to disable. handy if you use bar with lots of crap.
 bool redraw_thread = false;
 
+// experimental bar stuff
 #define BAR_VERT 0
 #define BAR_FLAT 1
 #define BAR_DEFAULT 0
 #define BAR_REVERSED 1
 #define BAR_BIDIRECTIONAL 2
-// experimental bar stuff
+#define MAX_BAR_COUNT 65535
+#define MIN_BAR_COUNT 2
+
 bool bar_enabled = false;
 double *bar_heights = NULL;
 double bar_step = 15;
 double bar_base_height = 25;
 double bar_periodic_step = 15;
 double max_bar_height = 25;
-int num_bars = 0;
-int bar_width = 150;
+int bar_count = 0;
+int bar_width = 0;
 int bar_orientation = BAR_FLAT;
 
 char bar_base_color[9] = "000000ff";
@@ -1544,6 +1547,7 @@ int main(int argc, char *argv[]) {
         {"bar-color", required_argument, NULL, 707},
         {"bar-periodic-step", required_argument, NULL, 708},
         {"bar-position", required_argument, NULL, 709},
+        {"bar-count", required_argument, NULL, 710},
 
         // misc.
         {"redraw-thread", no_argument, NULL, 900},
@@ -2090,7 +2094,6 @@ int main(int argc, char *argv[]) {
             case 702:
                 bar_width = atoi(optarg);
                 if (bar_width < 1) bar_width = 150;
-                // num_bars and bar_heights* initialized later when we grab display info
                 break;
             case 703:
                 arg = optarg;
@@ -2130,6 +2133,12 @@ int main(int argc, char *argv[]) {
                 arg = optarg;
                 if (sscanf(arg, "%31s", bar_expr) != 1) {
                     errx(1, "bar-position must be of the form [pos] with a max length of 31\n");
+                }
+                break;
+            case 710:
+                bar_count = atoi(optarg);
+                if (bar_count > MAX_BAR_COUNT || bar_count < MIN_BAR_COUNT) {
+                    errx(1, "bar-count must be between %d and %d\n", MIN_BAR_COUNT, MAX_BAR_COUNT);
                 }
                 break;
 
@@ -2278,13 +2287,28 @@ int main(int argc, char *argv[]) {
     last_resolution[0] = screen->width_in_pixels;
     last_resolution[1] = screen->height_in_pixels;
 
-    if (bar_enabled && bar_width > 0) {
-        int tmp = screen->width_in_pixels;
-        if (bar_orientation == BAR_VERT) tmp = screen->height_in_pixels;
-        num_bars = tmp / bar_width;
-        if (tmp % bar_width != 0) ++num_bars;
+    if (bar_enabled) {
+        if (bar_count == 0) {
+            if (bar_width != 0) {
+                fprintf(stderr, "Warning: bar-width is deprecated, use bar-count instead\n");
+                int tmp = screen->width_in_pixels;
+                if (bar_orientation == BAR_VERT) tmp = screen->height_in_pixels;
+                bar_count = tmp / bar_width;
+                if (tmp % bar_width != 0) {
+                    ++bar_count;
+                }
+            } else {
+                bar_count = MIN_BAR_COUNT;
+            }
+        } else if (bar_width != 0) {
+            errx(EXIT_FAILURE, "bar-width and bar-count cannot be used at the same time");
+        }
 
-        bar_heights = (double*) calloc(num_bars, sizeof(double));
+        if (bar_count >= MIN_BAR_COUNT && bar_count <= MAX_BAR_COUNT) {
+            bar_heights = (double*) calloc(bar_count, sizeof(double));
+        } else {
+            bar_enabled = false;
+        }
     }
 
     xcb_change_window_attributes(conn, screen->root, XCB_CW_EVENT_MASK,
