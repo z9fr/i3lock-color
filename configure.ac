@@ -159,9 +159,10 @@ AS_HELP_STRING([is release version:], [${is_release}])
 
 AS_HELP_STRING([enable debug flags:], [${ax_enable_debug}])
 AS_HELP_STRING([code coverage:], [${CODE_COVERAGE_ENABLED}])
-AS_HELP_STRING([enabled sanitizers:], [${ax_enabled_sanitizers}])
+AS_HELP_STRING([enabled sanitizers:], [${ax_enabled_sanitizers}])"
 
-To compile, run:
-
-  cd `pwd` && make
---------------------------------------------------------------------------------"
+#To compile, run:
+#
+#  cd `pwd` && make
+echo \
+"--------------------------------------------------------------------------------"
