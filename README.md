@@ -113,12 +113,10 @@ cd i3lock-color
 ```
 To build without installing, run:
 ```
-chmod +x build.sh
 ./build.sh
 ```
 To build AND install, run:
 ```
-chmod +x install-i3lock-color.sh
 ./install-i3lock-color.sh
 ```
 You may choose to modify the script based on your needs/OS/distro.
