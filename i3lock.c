@@ -70,7 +70,7 @@
 typedef void (*ev_callback_t)(EV_P_ ev_timer *w, int revents);
 static void input_done(void);
 
-char color[9] = "ffffffff";
+char color[9] = "a3a3a3ff";
 
 /* options for unlock indicator colors */
 char insidevercolor[9] = "006effbf";
