@@ -3,7 +3,7 @@
  *
  * © 2010 Michael Stapelberg
  * © 2015 Cassandra Fox
- * © 2020 Raymond Li
+ * © 2021 Raymond Li
  *
  * See LICENSE for licensing information
  *
