@@ -3,7 +3,7 @@
  *
  * © 2010 Michael Stapelberg
  * © 2015 Cassandra Fox
- * © 2020 Raymond Li
+ * © 2021 Raymond Li
  *
  * See LICENSE for licensing information
  *
@@ -1436,38 +1436,38 @@ int main(int argc, char *argv[]) {
         {"ignore-empty-password", no_argument, NULL, 'e'},
         {"inactivity-timeout", required_argument, NULL, 'I'},
         {"show-failed-attempts", no_argument, NULL, 'f'},
+        {"screen", required_argument, NULL, 'S'},
+        {"blur", required_argument, NULL, 'B'},
 
         // options for unlock indicator colors
-        {"insidevercolor", required_argument, NULL, 300},
-        {"insidewrongcolor", required_argument, NULL, 301},
-        {"insidecolor", required_argument, NULL, 302},
-        {"ringvercolor", required_argument, NULL, 303},
-        {"ringwrongcolor", required_argument, NULL, 304},
-        {"ringcolor", required_argument, NULL, 305},
-        {"linecolor", required_argument, NULL, 306},
-        {"verifcolor", required_argument, NULL, 307},
-        {"wrongcolor", required_argument, NULL, 308},
-        {"layoutcolor", required_argument, NULL, 309},
-        {"timecolor", required_argument, NULL, 310},
-        {"datecolor", required_argument, NULL, 311},
-        {"keyhlcolor", required_argument, NULL, 312},
-        {"bshlcolor", required_argument, NULL, 313},
-        {"separatorcolor", required_argument, NULL, 314},
-        {"greetercolor", required_argument, NULL, 315},
+        {"insidever-color", required_argument, NULL, 300},
+        {"insidewrong-color", required_argument, NULL, 301},
+        {"inside-color", required_argument, NULL, 302},
+        {"ringver-color", required_argument, NULL, 303},
+        {"ringwrong-color", required_argument, NULL, 304},
+        {"ring-color", required_argument, NULL, 305},
+        {"line-color", required_argument, NULL, 306},
+        {"verif-color", required_argument, NULL, 307},
+        {"wrong-color", required_argument, NULL, 308},
+        {"layout-color", required_argument, NULL, 309},
+        {"time-color", required_argument, NULL, 310},
+        {"date-color", required_argument, NULL, 311},
+        {"keyhl-color", required_argument, NULL, 312},
+        {"bshl-color", required_argument, NULL, 313},
+        {"separator-color", required_argument, NULL, 314},
+        {"greeter-color", required_argument, NULL, 315},
 
         // text outline colors
-        {"verifoutlinecolor", required_argument, NULL, 316},
-        {"wrongoutlinecolor", required_argument, NULL, 317},
-        {"layoutoutlinecolor", required_argument, NULL, 318},
-        {"timeoutlinecolor", required_argument, NULL, 319},
-        {"dateoutlinecolor", required_argument, NULL, 320},
-        {"greeteroutlinecolor", required_argument, NULL, 321},
+        {"verifoutline-color", required_argument, NULL, 316},
+        {"wrongoutline-color", required_argument, NULL, 317},
+        {"layoutoutline-color", required_argument, NULL, 318},
+        {"timeoutline-color", required_argument, NULL, 319},
+        {"dateoutline-color", required_argument, NULL, 320},
+        {"greeteroutline-color", required_argument, NULL, 321},
 
         {"line-uses-ring", no_argument, NULL, 'r'},
         {"line-uses-inside", no_argument, NULL, 's'},
 
-        {"screen", required_argument, NULL, 'S'},
-        {"blur", required_argument, NULL, 'B'},
         {"clock", no_argument, NULL, 'k'},
         {"force-clock", no_argument, NULL, 400},
         {"indicator", no_argument, NULL, 401},
@@ -1484,16 +1484,16 @@ int main(int argc, char *argv[]) {
         {"greeter-align", required_argument, NULL, 506},
 
         // string stuff
-        {"timestr", required_argument, NULL, 510},
-        {"datestr", required_argument, NULL, 511},
-        {"veriftext", required_argument, NULL, 512},
-        {"wrongtext", required_argument, NULL, 513},
+        {"time-str", required_argument, NULL, 510},
+        {"date-str", required_argument, NULL, 511},
+        {"verif-text", required_argument, NULL, 512},
+        {"wrong-text", required_argument, NULL, 513},
         {"keylayout", required_argument, NULL, 514},
-        {"noinputtext", required_argument, NULL, 515},
-        {"locktext", required_argument, NULL, 516},
-        {"lockfailedtext", required_argument, NULL, 517},
-        {"greetertext", required_argument, NULL, 518},
-        {"no-modkeytext", no_argument, NULL, 519},
+        {"noinput-text", required_argument, NULL, 515},
+        {"lock-text", required_argument, NULL, 516},
+        {"lockfailed-text", required_argument, NULL, 517},
+        {"greeter-text", required_argument, NULL, 518},
+        {"no-modkey-text", no_argument, NULL, 519},
 
         // fonts
         {"time-font", required_argument, NULL, 520},
@@ -1504,33 +1504,33 @@ int main(int argc, char *argv[]) {
         {"greeter-font", required_argument, NULL, 525},
 
         // text size
-        {"timesize", required_argument, NULL, 530},
-        {"datesize", required_argument, NULL, 531},
-        {"verifsize", required_argument, NULL, 532},
-        {"wrongsize", required_argument, NULL, 533},
-        {"layoutsize", required_argument, NULL, 534},
-        {"modsize", required_argument, NULL, 535},
-        {"greetersize", required_argument, NULL, 536},
+        {"time-size", required_argument, NULL, 530},
+        {"date-size", required_argument, NULL, 531},
+        {"verif-size", required_argument, NULL, 532},
+        {"wrong-size", required_argument, NULL, 533},
+        {"layout-size", required_argument, NULL, 534},
+        {"modif-size", required_argument, NULL, 535},
+        {"greeter-size", required_argument, NULL, 536},
 
         // text/indicator positioning
-        {"timepos", required_argument, NULL, 540},
-        {"datepos", required_argument, NULL, 541},
-        {"verifpos", required_argument, NULL, 542},
-        {"wrongpos", required_argument, NULL, 543},
-        {"layoutpos", required_argument, NULL, 544},
-        {"statuspos", required_argument, NULL, 545},
-        {"modifpos", required_argument, NULL, 546},
-        {"indpos", required_argument, NULL, 547},
-        {"greeterpos", required_argument, NULL, 548},
+        {"time-pos", required_argument, NULL, 540},
+        {"date-pos", required_argument, NULL, 541},
+        {"verif-pos", required_argument, NULL, 542},
+        {"wrong-pos", required_argument, NULL, 543},
+        {"layout-pos", required_argument, NULL, 544},
+        {"status-pos", required_argument, NULL, 545},
+        {"modif-pos", required_argument, NULL, 546},
+        {"ind-pos", required_argument, NULL, 547},
+        {"greeter-pos", required_argument, NULL, 548},
 
         // text outline width
-        {"timeoutlinewidth", required_argument, NULL, 560},
-        {"dateoutlinewidth", required_argument, NULL, 561},
-        {"verifoutlinewidth", required_argument, NULL, 562},
-        {"wrongoutlinewidth", required_argument, NULL, 563},
-        {"modifieroutlinewidth", required_argument, NULL, 564},
-        {"layoutoutlinewidth", required_argument, NULL, 565},
-        {"greeteroutlinewidth", required_argument, NULL, 566},
+        {"timeoutline-width", required_argument, NULL, 560},
+        {"dateoutline-width", required_argument, NULL, 561},
+        {"verifoutline-width", required_argument, NULL, 562},
+        {"wrongoutline-width", required_argument, NULL, 563},
+        {"modifieroutline-width", required_argument, NULL, 564},
+        {"layoutoutline-width", required_argument, NULL, 565},
+        {"greeteroutline-width", required_argument, NULL, 566},
 
 		// pass keys
         {"pass-media-keys", no_argument, NULL, 601},
@@ -1548,7 +1548,7 @@ int main(int argc, char *argv[]) {
         {"bar-base-width", required_argument, NULL, 706},
         {"bar-color", required_argument, NULL, 707},
         {"bar-periodic-step", required_argument, NULL, 708},
-        {"bar-position", required_argument, NULL, 709},
+        {"bar-pos", required_argument, NULL, 709},
         {"bar-count", required_argument, NULL, 710},
         {"bar-total-width", required_argument, NULL, 711},
 
@@ -1599,7 +1599,7 @@ int main(int argc, char *argv[]) {
     while ((o = getopt_long(argc, argv, optstring, longopts, &longoptind)) != -1) {
         switch (o) {
             case 'v':
-                errx(EXIT_SUCCESS, "version " I3LOCK_VERSION " © 2010 Michael Stapelberg, © 2015 Cassandra Fox, © 2020 Raymond Li");
+                errx(EXIT_SUCCESS, "version " I3LOCK_VERSION " © 2010 Michael Stapelberg, © 2015 Cassandra Fox, © 2021 Raymond Li");
             case 'n':
                 dont_fork = true;
                 break;
