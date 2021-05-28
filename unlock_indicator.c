@@ -88,6 +88,7 @@ extern char wrongcolor[9];
 extern char layoutcolor[9];
 extern char timecolor[9];
 extern char datecolor[9];
+extern char modifcolor[9];
 extern char keyhlcolor[9];
 extern char bshlcolor[9];
 extern char separatorcolor[9];
@@ -99,6 +100,7 @@ extern char wrongoutlinecolor[9];
 extern char layoutoutlinecolor[9];
 extern char timeoutlinecolor[9];
 extern char dateoutlinecolor[9];
+extern char modifoutlinecolor[9];
 extern char greeteroutlinecolor[9];
 
 extern int screen_number;
@@ -202,6 +204,7 @@ rgba_t wrong16;
 rgba_t layout16;
 rgba_t time16;
 rgba_t date16;
+rgba_t modif16;
 rgba_t keyhl16;
 rgba_t bshl16;
 rgba_t sep16;
@@ -214,6 +217,7 @@ rgba_t wrongoutline16;
 rgba_t layoutoutline16;
 rgba_t timeoutline16;
 rgba_t dateoutline16;
+rgba_t modifoutline16;
 rgba_t greeteroutline16;
 
 // experimental bar stuff
@@ -580,6 +584,7 @@ void init_colors_once(void) {
     colorgen(&tmp, layoutcolor, &layout16);
     colorgen(&tmp, timecolor, &time16);
     colorgen(&tmp, datecolor, &date16);
+    colorgen(&tmp, modifcolor, &modif16);
     colorgen(&tmp, keyhlcolor, &keyhl16);
     colorgen(&tmp, bshlcolor, &bshl16);
     colorgen(&tmp, separatorcolor, &sep16);
@@ -592,6 +597,7 @@ void init_colors_once(void) {
     colorgen(&tmp, layoutoutlinecolor, &layoutoutline16);
     colorgen(&tmp, timeoutlinecolor, &timeoutline16);
     colorgen(&tmp, dateoutlinecolor, &dateoutline16);
+    colorgen(&tmp, modifoutlinecolor, &modifoutline16);
     colorgen(&tmp, greeteroutlinecolor, &greeteroutline16);
 }
 
@@ -797,8 +803,8 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
         draw_data.mod_text.outline_width = modifieroutlinewidth;
         draw_data.mod_text.font = get_font_face(WRONG_FONT);
         draw_data.mod_text.align = modif_align;
-        draw_data.mod_text.color = wrong16;
-        draw_data.mod_text.outline_color = wrongoutline16;
+        draw_data.mod_text.color = modif16;
+        draw_data.mod_text.outline_color = modifoutline16;
     }
 
     if (layout_text) {
