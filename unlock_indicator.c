@@ -100,8 +100,8 @@ extern char wrongoutlinecolor[9];
 extern char layoutoutlinecolor[9];
 extern char timeoutlinecolor[9];
 extern char dateoutlinecolor[9];
-extern char modifoutlinecolor[9];
 extern char greeteroutlinecolor[9];
+extern char modifoutlinecolor[9];
 
 extern int screen_number;
 extern float refresh_rate;
@@ -217,8 +217,8 @@ rgba_t wrongoutline16;
 rgba_t layoutoutline16;
 rgba_t timeoutline16;
 rgba_t dateoutline16;
-rgba_t modifoutline16;
 rgba_t greeteroutline16;
+rgba_t modifoutline16;
 
 // experimental bar stuff
 
@@ -597,8 +597,8 @@ void init_colors_once(void) {
     colorgen(&tmp, layoutoutlinecolor, &layoutoutline16);
     colorgen(&tmp, timeoutlinecolor, &timeoutline16);
     colorgen(&tmp, dateoutlinecolor, &dateoutline16);
-    colorgen(&tmp, modifoutlinecolor, &modifoutline16);
     colorgen(&tmp, greeteroutlinecolor, &greeteroutline16);
+    colorgen(&tmp, modifoutlinecolor, &modifoutline16);
 }
 
 static te_expr *compile_expression(const char *const from, const char *expression, const te_variable *variables, int var_count) {
