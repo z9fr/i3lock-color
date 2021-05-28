@@ -184,7 +184,9 @@ The width of the ring unlock indicator. Defaults to 7.0.
 
 .TP
 .B \-\-{inside, ring}\-color=rrggbbaa
-Sets the idle color for the interior circle and ring.
+Sets the idle color for the interior circle and ring.  Note: use individual
+options per element unless the shell supports brace expansion (in which case
+remove the spaces inside the curly braces).
 
 .TP
 .B \-\-{inside, ring}ver\-color=rrggbbaa
@@ -200,7 +202,7 @@ Sets the color for the line separating the inside circle and the outer ring.
 
 .TP
 .B \-\-line\-uses\-{inside, ring}
-Overrides \-\-linecolor. The line will match the {inside, ring} color.
+Overrides \-\-line\-color. The line will match the {inside, ring} color.
 Note: these two options conflict with each other.
 
 .TP
@@ -313,7 +315,7 @@ r - the unlock indicator radius.
 
 .TP
 .B \-\-time\-pos="x\-position:y\-position"
-Sets the position for the time string. All the variables from \-\-indpos may be
+Sets the position for the time string. All the variables from \-\-ind\-pos may be
 used, in addition to:
 .RS
 .RS
@@ -324,8 +326,8 @@ iy - the y value of the indicator on the current display.
 
 .TP
 .B \-\-date\-pos="x\-position:y\-position"
-Sets the position for the date string. All the variables from \-\-indpos and
-\-\-timepos may be used, in addition to:
+Sets the position for the date string. All the variables from \-\-ind\-pos and
+\-\-time\-pos may be used, in addition to:
 .RS
 .RS
 tx - the computed x value of the timestring, for the current display.
@@ -335,8 +337,8 @@ ty - the computed y value of the timestring, for the current display.
 
 .TP
 .B \-\-greeter\-pos="x\-position:y\-position"
-Sets the position for the greeter string. All the variables from \-\-indpos and
-\-\-timepos may be used.
+Sets the position for the greeter string. All the variables from \-\-ind\-pos and
+\-\-time\-pos may be used.
 
 .TP
 .B \-\-pass\-{media, screen, power, volume}\-keys
