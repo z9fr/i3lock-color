@@ -85,6 +85,7 @@ char wrongcolor[9] = "000000ff";
 char layoutcolor[9] = "000000ff";
 char timecolor[9] = "000000ff";
 char datecolor[9] = "000000ff";
+char modifcolor[9] = "000000ff";
 char keyhlcolor[9] = "33db00ff";
 char bshlcolor[9] = "db3300ff";
 char separatorcolor[9] = "000000ff";
@@ -96,6 +97,7 @@ char layoutoutlinecolor[9] = "00000000";
 char timeoutlinecolor[9] = "00000000";
 char dateoutlinecolor[9] = "00000000";
 char greeteroutlinecolor[9] = "00000000";
+char modifoutlinecolor[9] = "00000000";
 
 /* int defining which display the lock indicator should be shown on. If -1, then show on all displays.*/
 int screen_number = 0;
@@ -1452,6 +1454,7 @@ int main(int argc, char *argv[]) {
         {"layout-color", required_argument, NULL, 309},
         {"time-color", required_argument, NULL, 310},
         {"date-color", required_argument, NULL, 311},
+        {"modif-color", required_argument, NULL, 322},
         {"keyhl-color", required_argument, NULL, 312},
         {"bshl-color", required_argument, NULL, 313},
         {"separator-color", required_argument, NULL, 314},
@@ -1464,6 +1467,7 @@ int main(int argc, char *argv[]) {
         {"timeoutline-color", required_argument, NULL, 319},
         {"dateoutline-color", required_argument, NULL, 320},
         {"greeteroutline-color", required_argument, NULL, 321},
+        {"modifoutline-color", required_argument, NULL, 323},
 
         {"line-uses-ring", no_argument, NULL, 'r'},
         {"line-uses-inside", no_argument, NULL, 's'},
@@ -1739,6 +1743,12 @@ int main(int argc, char *argv[]) {
                 break;
             case  321:
                 parse_color(greeteroutlinecolor);
+                break;
+            case  322:
+                parse_color(modifcolor);
+                break;
+            case  323:
+                parse_color(modifoutlinecolor);
                 break;
 
 
