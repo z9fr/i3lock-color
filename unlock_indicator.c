@@ -62,7 +62,6 @@ extern char *modifier_string;
 
 /* A Cairo surface containing the specified image (-i), if any. */
 extern cairo_surface_t *img;
-extern cairo_surface_t *blur_img;
 extern cairo_surface_t *img_slideshow[256];
 extern int slideshow_image_count;
 extern int slideshow_interval;
@@ -70,9 +69,8 @@ extern bool slideshow_random_selection;
 
 unsigned long lastCheck;
 
-/* Whether the image should be tiled or centered. */
-extern bool centered;
-extern bool tile;
+/* How the background image should be displayed */
+extern background_type_t bg_type;
 /* The background color to use (in hex). */
 extern char color[9];
 /* indicator color options */
@@ -699,13 +697,8 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
         }
     }
 
-    if (blur_img || img) {
-        if (blur_img) {
-            cairo_set_source_surface(xcb_ctx, blur_img, 0, 0);
-            cairo_paint(xcb_ctx);
-        } else {  // img can no longer be non-NULL if blur_img is not null
-            draw_image(resolution, xcb_ctx);
-        }
+    if (img) {
+        draw_image(resolution, img, xcb_ctx);
     } else {
         cairo_set_source_rgba(xcb_ctx, background.red, background.green, background.blue, background.alpha);
         cairo_rectangle(xcb_ctx, 0, 0, resolution[0], resolution[1]);
@@ -1108,54 +1101,50 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
  * Draws the configured image on the provided context. The image is drawn centered on all monitors, tiled, or just
  * painted starting from 0,0.
  */
-void draw_image(uint32_t* resolution, cairo_t* xcb_ctx) {
-    if (centered) {
-        double image_width = cairo_image_surface_get_width(img);
-        double image_height = cairo_image_surface_get_height(img);
+void draw_image(uint32_t* root_resolution, cairo_surface_t *img, cairo_t* xcb_ctx) {
+    double image_width = cairo_image_surface_get_width(img);
+    double image_height = cairo_image_surface_get_height(img);
 
-        xcb_randr_get_screen_resources_current_reply_t *reply = xcb_randr_get_screen_resources_current_reply(
-                conn, xcb_randr_get_screen_resources_current(conn, screen->root), NULL);
+    switch (bg_type) {
+        case CENTER:
+        case FILL:
+        case SCALE:
+        case MAX:
+            cairo_save(xcb_ctx);
+            for (int i = 0; i < xr_screens; i++) {
+                // Paint around center of monitor
+                double origin_x = xr_resolutions[i].x + (xr_resolutions[i].width  / 2.0 - image_width  / 2.0);
+                double origin_y = xr_resolutions[i].y + (xr_resolutions[i].height / 2.0 - image_height / 2.0);
 
-        xcb_timestamp_t timestamp = reply->config_timestamp;
-        int len = xcb_randr_get_screen_resources_current_outputs_length(reply);
-        xcb_randr_output_t *randr_outputs = xcb_randr_get_screen_resources_current_outputs(reply);
+                if (bg_type == SCALE) {
+                    cairo_scale(xcb_ctx,
+                        (double) xr_resolutions[i].width / image_width,
+                        (double) xr_resolutions[i].height / image_height);
+                }
 
-        // For every output
-        for (int i = 0; i < len; i++) {
-            xcb_randr_get_output_info_reply_t *output = xcb_randr_get_output_info_reply(
-                    conn, xcb_randr_get_output_info(conn, randr_outputs[i], timestamp), NULL);
-            if (output == NULL)
-                continue;
+                cairo_set_source_surface(xcb_ctx, img, origin_x, origin_y);
+                cairo_paint(xcb_ctx);
+            }
+            cairo_restore(xcb_ctx);
+            break;
 
-            if (output->crtc == XCB_NONE || output->connection == XCB_RANDR_CONNECTION_DISCONNECTED)
-                continue;
+        case TILE:
+            {
+                /* create a pattern and fill a rectangle as big as the screen */
+                cairo_pattern_t *pattern;
+                pattern = cairo_pattern_create_for_surface(img);
+                cairo_set_source(xcb_ctx, pattern);
+                cairo_pattern_set_extend(pattern, CAIRO_EXTEND_REPEAT);
+                cairo_rectangle(xcb_ctx, 0, 0, root_resolution[0], root_resolution[1]);
+                cairo_fill(xcb_ctx);
+                cairo_pattern_destroy(pattern);
+                break;
+            }
 
-            xcb_randr_get_crtc_info_cookie_t infoCookie = xcb_randr_get_crtc_info(conn, output->crtc,
-                                                                                  timestamp);
-            xcb_randr_get_crtc_info_reply_t *crtc = xcb_randr_get_crtc_info_reply(conn, infoCookie, NULL);
-
-            // Paint around center of monitor
-            double origin_x = crtc->x + (crtc->width / 2.0 - image_width / 2.0);
-            double origin_y = crtc->y + (crtc->height / 2.0 - image_height / 2.0);
-
-            cairo_set_source_surface(xcb_ctx, img, origin_x, origin_y);
+        default:
+            cairo_set_source_surface(xcb_ctx, img, 0, 0);
             cairo_paint(xcb_ctx);
-
-            free(crtc);
-            free(output);
-        }
-    }  else if (tile) {
-        /* create a pattern and fill a rectangle as big as the screen */
-        cairo_pattern_t *pattern;
-        pattern = cairo_pattern_create_for_surface(img);
-        cairo_set_source(xcb_ctx, pattern);
-        cairo_pattern_set_extend(pattern, CAIRO_EXTEND_REPEAT);
-        cairo_rectangle(xcb_ctx, 0, 0, resolution[0], resolution[1]);
-        cairo_fill(xcb_ctx);
-        cairo_pattern_destroy(pattern);
-    } else {
-        cairo_set_source_surface(xcb_ctx, img, 0, 0);
-        cairo_paint(xcb_ctx);
+            break;
     }
 
 }
