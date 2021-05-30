@@ -1144,13 +1144,19 @@ void draw_image(uint32_t* root_resolution, cairo_surface_t *img, cairo_t* xcb_ct
 
         case TILE:
             {
-                /* create a pattern and fill a rectangle as big as the screen */
-                cairo_pattern_t *pattern;
-                pattern = cairo_pattern_create_for_surface(img);
+                cairo_pattern_t *pattern = cairo_pattern_create_for_surface(img);
                 cairo_set_source(xcb_ctx, pattern);
                 cairo_pattern_set_extend(pattern, CAIRO_EXTEND_REPEAT);
-                cairo_rectangle(xcb_ctx, 0, 0, root_resolution[0], root_resolution[1]);
-                cairo_fill(xcb_ctx);
+
+                for (int i = 0; i < xr_screens; i++) {
+                    cairo_matrix_t matrix;
+                    cairo_matrix_init_translate(&matrix, -xr_resolutions[i].x, -xr_resolutions[i].y);
+                    cairo_pattern_set_matrix(pattern, &matrix);
+
+                    cairo_rectangle(xcb_ctx, xr_resolutions[i].x, xr_resolutions[i].y, xr_resolutions[i].width, xr_resolutions[i].height);
+                    cairo_fill(xcb_ctx);
+                }
+
                 cairo_pattern_destroy(pattern);
                 break;
             }
