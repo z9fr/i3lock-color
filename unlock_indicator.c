@@ -1110,22 +1110,36 @@ void draw_image(uint32_t* root_resolution, cairo_surface_t *img, cairo_t* xcb_ct
         case FILL:
         case SCALE:
         case MAX:
-            cairo_save(xcb_ctx);
             for (int i = 0; i < xr_screens; i++) {
-                // Paint around center of monitor
-                double origin_x = xr_resolutions[i].x + (xr_resolutions[i].width  / 2.0 - image_width  / 2.0);
-                double origin_y = xr_resolutions[i].y + (xr_resolutions[i].height / 2.0 - image_height / 2.0);
+                cairo_save(xcb_ctx);
 
+                // Scale image according to bg_type and aspect ratios
+                double scale_x = 1, scale_y = 1;
                 if (bg_type == SCALE) {
-                    cairo_scale(xcb_ctx,
-                        (double) xr_resolutions[i].width / image_width,
-                        (double) xr_resolutions[i].height / image_height);
+                    scale_x = xr_resolutions[i].width / image_width;
+                    scale_y = xr_resolutions[i].height / image_height;
+                } else {
+                    double aspect_diff = (double) xr_resolutions[i].height / xr_resolutions[i].width - image_height / image_width;
+                    if((bg_type == MAX && aspect_diff > 0) || (bg_type == FILL && aspect_diff < 0)) {
+                        scale_x = scale_y = xr_resolutions[i].width / image_width;
+                    } else if ((bg_type == MAX && aspect_diff < 0) || (bg_type == FILL && aspect_diff > 0)) {
+                        scale_x = scale_y = xr_resolutions[i].height / image_height;
+                    }
                 }
+
+                if (scale_x != 0 || scale_y != 0) {
+                    cairo_scale(xcb_ctx, scale_x, scale_y);
+                }
+
+                // Place image in the middle
+                double origin_x = (xr_resolutions[i].x + xr_resolutions[i].width / 2) / scale_x - image_width / 2;
+                double origin_y = (xr_resolutions[i].y + xr_resolutions[i].height / 2) / scale_y - image_height / 2;
 
                 cairo_set_source_surface(xcb_ctx, img, origin_x, origin_y);
                 cairo_paint(xcb_ctx);
+
+                cairo_restore(xcb_ctx);
             }
-            cairo_restore(xcb_ctx);
             break;
 
         case TILE:

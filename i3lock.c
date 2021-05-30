@@ -1436,7 +1436,7 @@ int main(int argc, char *argv[]) {
         {"centered", no_argument, NULL, 'C'},
         {"fill", no_argument, NULL, 'F'},
         {"scale", no_argument, NULL, 'L'},
-        {"scale", no_argument, NULL, 'M'},
+        {"max", no_argument, NULL, 'M'},
         {"ignore-empty-password", no_argument, NULL, 'e'},
         {"inactivity-timeout", required_argument, NULL, 'I'},
         {"show-failed-attempts", no_argument, NULL, 'f'},
@@ -1627,30 +1627,31 @@ int main(int argc, char *argv[]) {
                 break;
             case 't':
                 if(bg_type != NONE) {
-                    errx(EXIT_FAILURE, "i3lock-color: Options tiling, centered, and fill conflict.");
+                    errx(EXIT_FAILURE, "i3lock-color: Only one background type can be used.");
                 }
                 bg_type = TILE;
                 break;
             case 'C':
                 if(bg_type != NONE) {
-                    errx(EXIT_FAILURE, "i3lock-color: Options tiling, centered, and fill conflict.");
+                    errx(EXIT_FAILURE, "i3lock-color: Only one background type can be used.");
                 }
                 bg_type = CENTER;
                 break;
             case 'F':
                 if(bg_type != NONE) {
-                    errx(EXIT_FAILURE, "i3lock-color: Options tiling, centered, and fill conflict.");
+                    errx(EXIT_FAILURE, "i3lock-color: Only one background type can be used.");
                 }
                 bg_type = FILL;
+                break;
             case 'L':
                 if(bg_type != NONE) {
-                    errx(EXIT_FAILURE, "i3lock-color: Options tiling, centered, and fill conflict.");
+                    errx(EXIT_FAILURE, "i3lock-color: Only one background type can be used.");
                 }
                 bg_type = SCALE;
                 break;
             case 'M':
                 if(bg_type != NONE) {
-                    errx(EXIT_FAILURE, "i3lock-color: Options tiling, centered, and fill conflict.");
+                    errx(EXIT_FAILURE, "i3lock-color: Only one background type can be used.");
                 }
                 bg_type = MAX;
                 break;
