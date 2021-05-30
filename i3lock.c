@@ -243,14 +243,13 @@ static uint8_t xkb_base_error;
 static int randr_base = -1;
 
 cairo_surface_t *img = NULL;
-cairo_surface_t *blur_img = NULL;
 cairo_surface_t *img_slideshow[256];
 int slideshow_image_count = 0;
 int slideshow_interval = 10;
 bool slideshow_random_selection = false;
 
-bool tile = false;
-bool centered = false;
+background_type_t bg_type = NONE;
+
 bool ignore_empty_password = false;
 bool skip_repeated_empty_password = false;
 bool pass_media_keys = false;
@@ -1358,6 +1357,7 @@ static cairo_surface_t* load_image(char* image_path, char* image_raw_format) {
                 img = cairo_image_surface_create_for_data(jpg_data,
                         CAIRO_FORMAT_ARGB32, jpg_info.width, jpg_info.height,
                         jpg_info.stride);
+                free(jpg_data);
             }
     }
 
@@ -1435,6 +1435,9 @@ int main(int argc, char *argv[]) {
         {"raw", required_argument, NULL, 998},
         {"tiling", no_argument, NULL, 't'},
         {"centered", no_argument, NULL, 'C'},
+        {"fill", no_argument, NULL, 'F'},
+        {"scale", no_argument, NULL, 'L'},
+        {"max", no_argument, NULL, 'M'},
         {"ignore-empty-password", no_argument, NULL, 'e'},
         {"inactivity-timeout", required_argument, NULL, 'I'},
         {"show-failed-attempts", no_argument, NULL, 'f'},
@@ -1575,7 +1578,7 @@ int main(int argc, char *argv[]) {
     if (getenv("WAYLAND_DISPLAY") != NULL)
         errx(EXIT_FAILURE, "i3lock is a program for X11 and does not work on Wayland. Try https://github.com/swaywm/swaylock instead");
 
-    char *optstring = "hvnbdc:p:ui:tCeI:frsS:kB:m";
+    char *optstring = "hvnbdc:p:ui:tCFLMeI:frsS:kB:m";
     char *arg = NULL;
     int opt = 0;
     char padded[9] = "ffffffff"; \
@@ -1624,16 +1627,34 @@ int main(int argc, char *argv[]) {
                 image_path = strdup(optarg);
                 break;
             case 't':
-                if(centered) {
-                    errx(EXIT_FAILURE, "i3lock-color: Options tiling and centered conflict.");
+                if(bg_type != NONE) {
+                    errx(EXIT_FAILURE, "i3lock-color: Only one background type can be used.");
                 }
-                tile = true;
+                bg_type = TILE;
                 break;
             case 'C':
-                if(tile) {
-                    errx(EXIT_FAILURE, "i3lock-color: Options tiling and centered conflict.");
+                if(bg_type != NONE) {
+                    errx(EXIT_FAILURE, "i3lock-color: Only one background type can be used.");
                 }
-                centered = true;
+                bg_type = CENTER;
+                break;
+            case 'F':
+                if(bg_type != NONE) {
+                    errx(EXIT_FAILURE, "i3lock-color: Only one background type can be used.");
+                }
+                bg_type = FILL;
+                break;
+            case 'L':
+                if(bg_type != NONE) {
+                    errx(EXIT_FAILURE, "i3lock-color: Only one background type can be used.");
+                }
+                bg_type = SCALE;
+                break;
+            case 'M':
+                if(bg_type != NONE) {
+                    errx(EXIT_FAILURE, "i3lock-color: Only one background type can be used.");
+                }
+                bg_type = MAX;
                 break;
             case 'p':
                 if (!strcmp(optarg, "win")) {
@@ -2349,20 +2370,22 @@ int main(int argc, char *argv[]) {
         *blur_pixmap = capture_bg_pixmap(conn, screen, last_resolution);
         cairo_surface_t *xcb_img = cairo_xcb_surface_create(conn, *blur_pixmap, vistype, last_resolution[0], last_resolution[1]);
 
-        blur_img = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, last_resolution[0], last_resolution[1]);
+        cairo_surface_t *blur_img = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, last_resolution[0], last_resolution[1]);
         cairo_t *ctx = cairo_create(blur_img);
         cairo_set_source_surface(ctx, xcb_img, 0, 0);
         cairo_paint(ctx);
 
         blur_image_surface(blur_img, blur_sigma);
         if (img) {
-            // Display image centered on all outputs.
-            draw_image(last_resolution, ctx);
+            // Display image on all outputs.
+            draw_image(last_resolution, img, ctx);
             cairo_surface_destroy(img);
-            img = NULL;
         }
         cairo_destroy(ctx);
         cairo_surface_destroy(xcb_img);
+
+        img = blur_img;
+        bg_type = NONE;
     }
 
     xcb_window_t stolen_focus = find_focused_window(conn, screen->root);
