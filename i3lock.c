@@ -1357,7 +1357,6 @@ static cairo_surface_t* load_image(char* image_path, char* image_raw_format) {
                 img = cairo_image_surface_create_for_data(jpg_data,
                         CAIRO_FORMAT_ARGB32, jpg_info.width, jpg_info.height,
                         jpg_info.stride);
-                free(jpg_data);
             }
     }
 
