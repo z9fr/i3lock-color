@@ -1357,6 +1357,7 @@ static cairo_surface_t* load_image(char* image_path, char* image_raw_format) {
                 img = cairo_image_surface_create_for_data(jpg_data,
                         CAIRO_FORMAT_ARGB32, jpg_info.width, jpg_info.height,
                         jpg_info.stride);
+                free(jpg_data);
             }
     }
 
@@ -2384,6 +2385,7 @@ int main(int argc, char *argv[]) {
         cairo_surface_destroy(xcb_img);
 
         img = blur_img;
+        bg_type = NONE;
     }
 
     xcb_window_t stolen_focus = find_focused_window(conn, screen->root);
