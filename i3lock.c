@@ -1577,7 +1577,7 @@ int main(int argc, char *argv[]) {
     if (getenv("WAYLAND_DISPLAY") != NULL)
         errx(EXIT_FAILURE, "i3lock is a program for X11 and does not work on Wayland. Try https://github.com/swaywm/swaylock instead");
 
-    char *optstring = "hvnbdc:p:ui:tCeI:frsS:kB:m";
+    char *optstring = "hvnbdc:p:ui:tCFLMeI:frsS:kB:m";
     char *arg = NULL;
     int opt = 0;
     char padded[9] = "ffffffff"; \
