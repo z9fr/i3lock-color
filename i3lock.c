@@ -244,6 +244,7 @@ static int randr_base = -1;
 
 cairo_surface_t *img = NULL;
 cairo_surface_t *img_slideshow[256];
+cairo_surface_t *blur_bg_img = NULL;
 int slideshow_image_count = 0;
 int slideshow_interval = 10;
 bool slideshow_random_selection = false;
@@ -2362,29 +2363,20 @@ int main(int argc, char *argv[]) {
 
     free(image_raw_format);
 
-    xcb_pixmap_t* blur_pixmap = NULL;
     if (blur) {
-        blur_pixmap = malloc(sizeof(xcb_pixmap_t));
-        xcb_visualtype_t *vistype = get_root_visual_type(screen);
-        *blur_pixmap = capture_bg_pixmap(conn, screen, last_resolution);
-        cairo_surface_t *xcb_img = cairo_xcb_surface_create(conn, *blur_pixmap, vistype, last_resolution[0], last_resolution[1]);
+        xcb_pixmap_t bg_pixmap = capture_bg_pixmap(conn, screen, last_resolution);
+        cairo_surface_t *xcb_img = cairo_xcb_surface_create(conn, bg_pixmap, get_root_visual_type(screen), last_resolution[0], last_resolution[1]);
 
-        cairo_surface_t *blur_img = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, last_resolution[0], last_resolution[1]);
-        cairo_t *ctx = cairo_create(blur_img);
+        blur_bg_img = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, last_resolution[0], last_resolution[1]);
+        cairo_t *ctx = cairo_create(blur_bg_img);
+
         cairo_set_source_surface(ctx, xcb_img, 0, 0);
         cairo_paint(ctx);
+        blur_image_surface(blur_bg_img, blur_sigma);
 
-        blur_image_surface(blur_img, blur_sigma);
-        if (img) {
-            // Display image on all outputs.
-            draw_image(last_resolution, img, ctx);
-            cairo_surface_destroy(img);
-        }
         cairo_destroy(ctx);
         cairo_surface_destroy(xcb_img);
-
-        img = blur_img;
-        bg_type = NONE;
+        xcb_free_pixmap(conn, bg_pixmap);
     }
 
     xcb_window_t stolen_focus = find_focused_window(conn, screen->root);
@@ -2395,14 +2387,7 @@ int main(int argc, char *argv[]) {
     xcb_pixmap_t pixmap = create_bg_pixmap(conn, win, last_resolution, color);
     render_lock(last_resolution, pixmap);
     xcb_change_window_attributes(conn, win, XCB_CW_BACK_PIXMAP, (uint32_t[]){pixmap});
-
     xcb_free_pixmap(conn, pixmap);
-    if (blur_pixmap) {
-        xcb_free_pixmap(conn, *blur_pixmap);
-        free(blur_pixmap);
-        blur_pixmap = NULL;
-    }
-
 
     cursor = create_cursor(conn, screen, win, curs_choice);
 

@@ -63,6 +63,7 @@ extern char *modifier_string;
 /* A Cairo surface containing the specified image (-i), if any. */
 extern cairo_surface_t *img;
 extern cairo_surface_t *img_slideshow[256];
+extern cairo_surface_t *blur_bg_img;
 extern int slideshow_image_count;
 extern int slideshow_interval;
 extern bool slideshow_random_selection;
@@ -697,12 +698,17 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
         }
     }
 
-    if (img) {
-        draw_image(resolution, img, xcb_ctx);
+    if (blur_bg_img) {
+        cairo_set_source_surface(xcb_ctx, blur_bg_img, 0, 0);
+        cairo_paint(xcb_ctx);
     } else {
         cairo_set_source_rgba(xcb_ctx, background.red, background.green, background.blue, background.alpha);
         cairo_rectangle(xcb_ctx, 0, 0, resolution[0], resolution[1]);
         cairo_fill(xcb_ctx);
+    }
+
+    if (img) {
+        draw_image(resolution, img, xcb_ctx);
     }
 
     /*
