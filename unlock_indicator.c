@@ -63,6 +63,7 @@ extern char *modifier_string;
 /* A Cairo surface containing the specified image (-i), if any. */
 extern cairo_surface_t *img;
 extern cairo_surface_t *img_slideshow[256];
+extern cairo_surface_t *blur_bg_img;
 extern int slideshow_image_count;
 extern int slideshow_interval;
 extern bool slideshow_random_selection;
@@ -697,12 +698,17 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
         }
     }
 
-    if (img) {
-        draw_image(resolution, img, xcb_ctx);
+    if (blur_bg_img) {
+        cairo_set_source_surface(xcb_ctx, blur_bg_img, 0, 0);
+        cairo_paint(xcb_ctx);
     } else {
         cairo_set_source_rgba(xcb_ctx, background.red, background.green, background.blue, background.alpha);
         cairo_rectangle(xcb_ctx, 0, 0, resolution[0], resolution[1]);
         cairo_fill(xcb_ctx);
+    }
+
+    if (img) {
+        draw_image(resolution, img, xcb_ctx);
     }
 
     /*
@@ -1144,13 +1150,19 @@ void draw_image(uint32_t* root_resolution, cairo_surface_t *img, cairo_t* xcb_ct
 
         case TILE:
             {
-                /* create a pattern and fill a rectangle as big as the screen */
-                cairo_pattern_t *pattern;
-                pattern = cairo_pattern_create_for_surface(img);
+                cairo_pattern_t *pattern = cairo_pattern_create_for_surface(img);
                 cairo_set_source(xcb_ctx, pattern);
                 cairo_pattern_set_extend(pattern, CAIRO_EXTEND_REPEAT);
-                cairo_rectangle(xcb_ctx, 0, 0, root_resolution[0], root_resolution[1]);
-                cairo_fill(xcb_ctx);
+
+                for (int i = 0; i < xr_screens; i++) {
+                    cairo_matrix_t matrix;
+                    cairo_matrix_init_translate(&matrix, -xr_resolutions[i].x, -xr_resolutions[i].y);
+                    cairo_pattern_set_matrix(pattern, &matrix);
+
+                    cairo_rectangle(xcb_ctx, xr_resolutions[i].x, xr_resolutions[i].y, xr_resolutions[i].width, xr_resolutions[i].height);
+                    cairo_fill(xcb_ctx);
+                }
+
                 cairo_pattern_destroy(pattern);
                 break;
             }
