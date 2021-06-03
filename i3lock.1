@@ -125,6 +125,24 @@ If an image is specified (via \-i) it will display the image centered on the
 screen (with a multi-monitor setup, the image is visible on all screens).
 
 .TP
+.B \-F, \-\-fill
+If an image is specified (via \-i) it will scale the image until it fills the
+screen. A portion of the image will be cropped.
+(with a multi-monitor setup, the image is visible on all screens).
+
+.TP
+.B \-M, \-\-max
+If an image is specified (via \-i) it will scale the image until either the
+width or the height fits the screen without being cropped. The border color
+can be set via \-c. (with a multi-monitor setup, the image is visible on all screens).
+
+.TP
+.B \-L, \-\-scale
+If an image is specified (via \-i) it will stretch the image until both the
+width and the height fits the screen.
+(with a multi-monitor setup, the image is visible on all screens).
+
+.TP
 .BI \-p\  win|default \fR,\ \fB\-\-pointer= win|default
 If you specify "default",
 .B i3lock
