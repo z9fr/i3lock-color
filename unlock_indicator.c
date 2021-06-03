@@ -875,7 +875,7 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
           scaling_factor, button_diameter_physical);
 
     // variable mapping for evaluating the clock position expression
-    const unsigned int vars_size = 11;
+    const unsigned int vars_size = 14;
     te_variable vars[] =
         {{"w", &width},
          {"h", &height},
