@@ -1105,74 +1105,62 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
 
 /**
  * Draws the configured image on the provided context. The image is drawn centered on all monitors, tiled, or just
- * painted starting from 0,0.
+ * painted starting from 0,0. It is also scaled if bg_type is FILL, MAX, or SCALE.
  */
 void draw_image(uint32_t* root_resolution, cairo_surface_t *img, cairo_t* xcb_ctx) {
+
+    if (bg_type == NONE) {
+        // Don't do any image manipulation
+        cairo_set_source_surface(xcb_ctx, img, 0, 0);
+        cairo_paint(xcb_ctx);
+        return;
+    }
+
+    cairo_pattern_t *pattern = cairo_pattern_create_for_surface(img);
+    cairo_pattern_set_extend(pattern, bg_type == TILE ? CAIRO_EXTEND_REPEAT : CAIRO_EXTEND_NONE);
+    cairo_set_source(xcb_ctx, pattern);
+
     double image_width = cairo_image_surface_get_width(img);
     double image_height = cairo_image_surface_get_height(img);
 
-    switch (bg_type) {
-        case CENTER:
-        case FILL:
-        case SCALE:
-        case MAX:
-            for (int i = 0; i < xr_screens; i++) {
-                cairo_save(xcb_ctx);
+    for (int i = 0; i < xr_screens; i++) {
+        // Find out scaling factors using bg_type and aspect ratios
+        double scale_x = 1, scale_y = 1;
+        if (bg_type == SCALE) {
+            scale_x = xr_resolutions[i].width / image_width;
+            scale_y = xr_resolutions[i].height / image_height;
 
-                // Scale image according to bg_type and aspect ratios
-                double scale_x = 1, scale_y = 1;
-                if (bg_type == SCALE) {
-                    scale_x = xr_resolutions[i].width / image_width;
-                    scale_y = xr_resolutions[i].height / image_height;
-                } else {
-                    double aspect_diff = (double) xr_resolutions[i].height / xr_resolutions[i].width - image_height / image_width;
-                    if((bg_type == MAX && aspect_diff > 0) || (bg_type == FILL && aspect_diff < 0)) {
-                        scale_x = scale_y = xr_resolutions[i].width / image_width;
-                    } else if ((bg_type == MAX && aspect_diff < 0) || (bg_type == FILL && aspect_diff > 0)) {
-                        scale_x = scale_y = xr_resolutions[i].height / image_height;
-                    }
-                }
-
-                if (scale_x != 0 || scale_y != 0) {
-                    cairo_scale(xcb_ctx, scale_x, scale_y);
-                }
-
-                // Place image in the middle
-                double origin_x = (xr_resolutions[i].x + xr_resolutions[i].width / 2) / scale_x - image_width / 2;
-                double origin_y = (xr_resolutions[i].y + xr_resolutions[i].height / 2) / scale_y - image_height / 2;
-
-                cairo_set_source_surface(xcb_ctx, img, origin_x, origin_y);
-                cairo_paint(xcb_ctx);
-
-                cairo_restore(xcb_ctx);
+        } else if (bg_type == MAX || bg_type == FILL) {
+            double aspect_diff = (double) xr_resolutions[i].height / xr_resolutions[i].width - image_height / image_width;
+            if((bg_type == MAX && aspect_diff > 0) || (bg_type == FILL && aspect_diff < 0)) {
+                scale_x = scale_y = xr_resolutions[i].width / image_width;
+            } else if ((bg_type == MAX && aspect_diff < 0) || (bg_type == FILL && aspect_diff > 0)) {
+                scale_x = scale_y = xr_resolutions[i].height / image_height;
             }
-            break;
+        }
 
-        case TILE:
-            {
-                cairo_pattern_t *pattern = cairo_pattern_create_for_surface(img);
-                cairo_set_source(xcb_ctx, pattern);
-                cairo_pattern_set_extend(pattern, CAIRO_EXTEND_REPEAT);
+        // Scale and translate the pattern
+        cairo_matrix_t matrix;
+        cairo_matrix_init_scale(&matrix, 1/scale_x, 1/scale_y);
 
-                for (int i = 0; i < xr_screens; i++) {
-                    cairo_matrix_t matrix;
-                    cairo_matrix_init_translate(&matrix, -xr_resolutions[i].x, -xr_resolutions[i].y);
-                    cairo_pattern_set_matrix(pattern, &matrix);
+        if (bg_type == TILE) {
+            // Start image from top-left corner
+            cairo_matrix_translate(&matrix, -xr_resolutions[i].x, -xr_resolutions[i].y);
+        } else {
+            // Draw image in the center of the screen
+            cairo_matrix_translate(&matrix,
+                (image_width  * scale_x - xr_resolutions[i].width ) / 2 - xr_resolutions[i].x,
+                (image_height * scale_y - xr_resolutions[i].height) / 2 - xr_resolutions[i].y);
+        }
 
-                    cairo_rectangle(xcb_ctx, xr_resolutions[i].x, xr_resolutions[i].y, xr_resolutions[i].width, xr_resolutions[i].height);
-                    cairo_fill(xcb_ctx);
-                }
+        cairo_pattern_set_matrix(pattern, &matrix);
 
-                cairo_pattern_destroy(pattern);
-                break;
-            }
-
-        default:
-            cairo_set_source_surface(xcb_ctx, img, 0, 0);
-            cairo_paint(xcb_ctx);
-            break;
+        // Draw to screen
+        cairo_rectangle(xcb_ctx, xr_resolutions[i].x, xr_resolutions[i].y, xr_resolutions[i].width, xr_resolutions[i].height);
+        cairo_fill(xcb_ctx);
     }
 
+    cairo_pattern_destroy(pattern);
 }
 
 /*
