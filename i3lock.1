@@ -327,7 +327,7 @@ y - y position of the current display.
     Corresponds to the topmost row of pixels on that display.
 w - width of the current display.
 h - height of the current display.
-r - the unlock indicator radius.
+r - unlock indicator radius.
 .RE
 .RE
 
@@ -337,10 +337,14 @@ Sets the position for the time string. All the variables from \-\-ind\-pos may b
 used, in addition to:
 .RS
 .RS
-ix - the x value of the indicator on the current display.
-iy - the y value of the indicator on the current display.
+ix - x position of the indicator on the current display.
+iy - y position of the indicator on the current display.
 .RE
 .RE
+If the \-\-bar\-indicator option is used, the following variables may be used:
+bw - width of the bar indicator.
+bx - x position of the bar indicator on the current display.
+by - y position of the bar indicator on the current display.
 
 .TP
 .B \-\-date\-pos="x\-position:y\-position"
@@ -348,8 +352,8 @@ Sets the position for the date string. All the variables from \-\-ind\-pos and
 \-\-time\-pos may be used, in addition to:
 .RS
 .RS
-tx - the computed x value of the timestring, for the current display.
-ty - the computed y value of the timestring, for the current display.
+tx - x position of the timestring on the current display.
+ty - y position of the timestring on the current display.
 .RE
 .RE
 
