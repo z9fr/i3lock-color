@@ -117,30 +117,31 @@ xcompmgr).
 .TP
 .B \-t, \-\-tiling
 If an image is specified (via \-i) it will display the image tiled all over the
-screen (with a multi-monitor setup, the image is visible on all screens).
+screen.
+
+Note: For all image options, with a multi-monitor setup, the image is visible on
+all screens.
 
 .TP
 .B \-C, \-\-centered
 If an image is specified (via \-i) it will display the image centered on the
-screen (with a multi-monitor setup, the image is visible on all screens).
+screen.
 
 .TP
 .B \-F, \-\-fill
 If an image is specified (via \-i) it will scale the image until it fills the
 screen. A portion of the image will be cropped.
-(with a multi-monitor setup, the image is visible on all screens).
 
 .TP
 .B \-M, \-\-max
 If an image is specified (via \-i) it will scale the image until either the
 width or the height fits the screen without being cropped. The border color
-can be set via \-c. (with a multi-monitor setup, the image is visible on all screens).
+can be set via \-c.
 
 .TP
 .B \-L, \-\-scale
 If an image is specified (via \-i) it will stretch the image until both the
 width and the height fits the screen.
-(with a multi-monitor setup, the image is visible on all screens).
 
 .TP
 .BI \-p\  win|default \fR,\ \fB\-\-pointer= win|default
@@ -261,11 +262,12 @@ Sets the string to be shown upon entering an incorrect password.
 Displays the keylayout. Positionable similar to date, time, and indicator.
 Modes are as follows:
 .RS
-.RS
+.IP \[bu] 2
 0 - Displays the full string returned by the query, i.e. "English (US)"
+.IP \[bu]
 1 - Displays up until the first parenthesis, i.e. "English"
+.IP \[bu]
 2 - Displays just the contents of the parenthesis, i.e. "US"
-.RE
 .RE
 
 .TP
@@ -293,11 +295,12 @@ Hides the modkey indicator (Num, Caps Lock ...)
 Sets the text alignment of the time, date, keylayout, verification, wrong,
 modifier and greeter texts.
 .RS
-.RS
+.IP \[bu] 2
 0 - centered (default)
+.IP \[bu]
 1 - left aligned
+.IP \[bu]
 2 - right aligned
-.RE
 .RE
 
 .TP
@@ -320,41 +323,48 @@ Sets the width of the outline.
 .B \-\-ind\-pos="x\-position:y\-position"
 Sets the position for the unlock indicator. Valid variables include:
 .RS
-.RS
+.IP \[bu] 2
 x - x position of the current display.
     Corresponds to the leftmost column of pixels on that display.
+.IP \[bu]
 y - y position of the current display.
     Corresponds to the topmost row of pixels on that display.
+.IP \[bu]
 w - width of the current display.
+.IP \[bu]
 h - height of the current display.
+.IP \[bu]
 r - unlock indicator radius.
-.RE
 .RE
 
 .TP
 .B \-\-time\-pos="x\-position:y\-position"
-Sets the position for the time string. All the variables from \-\-ind\-pos may be
-used, in addition to:
+Sets the position for the time string. All the variables from \-\-ind\-pos may
+be used, in addition to:
 .RS
-.RS
+.IP \[bu] 2
 ix - x position of the indicator on the current display.
+.IP \[bu]
 iy - y position of the indicator on the current display.
-.RE
-.RE
+
 If the \-\-bar\-indicator option is used, the following variables may be used:
+.IP \[bu] 2
 bw - width of the bar indicator.
+.IP \[bu]
 bx - x position of the bar indicator on the current display.
+.IP \[bu]
 by - y position of the bar indicator on the current display.
+.RE
 
 .TP
 .B \-\-date\-pos="x\-position:y\-position"
 Sets the position for the date string. All the variables from \-\-ind\-pos and
 \-\-time\-pos may be used, in addition to:
 .RS
-.RS
+.IP \[bu] 2
 tx - x position of the timestring on the current display.
+.IP \[bu]
 ty - y position of the timestring on the current display.
-.RE
 .RE
 
 .TP
@@ -367,13 +377,15 @@ Sets the position for the greeter string. All the variables from \-\-ind\-pos an
 Allow the following keys to be used normally while the screen is locked by
 passing them through:
 .RS
-.RS
+.IP \[bu] 2
 media - XF86AudioPlay, XF86AudioPause, XF86AudioStop, XF86AudioPrev,
         XF86AudioNext, XF86AudioMute, XF86AudioLowerVolume, XF86AudioRaiseVolume
+.IP \[bu]
 screen - XF86MonBrightnessUp, XF86MonBrightnessDown
+.IP \[bu]
 power - XF86PowerDown, XF86PowerOff, XF86Sleep
+.IP \[bu]
 volume - XF86AudioMute, XF86AudioLowerVolume, XF86AudioRaiseVolume
-.RE
 .RE
 
 .TP
