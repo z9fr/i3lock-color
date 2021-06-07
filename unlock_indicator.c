@@ -1132,7 +1132,7 @@ void draw_image(uint32_t* root_resolution, cairo_surface_t *img, cairo_t* xcb_ct
 
         } else if (bg_type == MAX || bg_type == FILL) {
             double aspect_diff = (double) xr_resolutions[i].height / xr_resolutions[i].width - image_height / image_width;
-            if((bg_type == MAX && aspect_diff > 0) || (bg_type == FILL && aspect_diff < 0)) {
+            if((bg_type == MAX && aspect_diff >= 0) || (bg_type == FILL && aspect_diff <= 0)) {
                 scale_x = scale_y = xr_resolutions[i].width / image_width;
             } else if ((bg_type == MAX && aspect_diff < 0) || (bg_type == FILL && aspect_diff > 0)) {
                 scale_x = scale_y = xr_resolutions[i].height / image_height;
