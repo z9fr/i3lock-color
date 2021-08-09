@@ -134,6 +134,7 @@ i3lock-color is available on **GURU**, under [`x11-misc/i3lock-color`](https://g
 
 ## FreeBSD port
 ~~[i3lock-color-port](https://github.com/rkashapov/i3lock-color-port/)~~ (severely out of date).
+[i3lock-color](https://www.freshports.org/x11/i3lock-color/) (up-to-date port)
 
 ## Running i3lock-color
 Simply invoke the 'i3lock' command. To get out of it, enter your password and press enter.
