@@ -259,6 +259,7 @@ bool pass_media_keys = false;
 bool pass_screen_keys = false;
 bool pass_power_keys = false;
 bool pass_volume_keys = false;
+bool special_passthrough = false;
 
 // for the rendering thread, so we can clean it up
 pthread_t draw_thread;
@@ -658,8 +659,12 @@ static bool skip_without_validation(void) {
  * grabs the keyboard again
  * */
 static void send_key_to_root(xcb_key_press_event_t *event, bool twice) {
+    if (!special_passthrough) {
+        xcb_send_event(conn, true, screen->root, XCB_EVENT_MASK_BUTTON_PRESS, (char *)event);
+        return;
+    }
+
     xcb_ungrab_keyboard(conn, XCB_CURRENT_TIME);
-    /*xcb_ungrab_key(conn, event->detail, screen->root, XCB_MOD_MASK_ANY);*/
     DEBUG("Received: %d at %ld\n", event->detail, time(0));
 
     xcb_test_fake_input(conn, XCB_KEY_PRESS, event->detail, XCB_CURRENT_TIME, screen->root, 0, 0, 0);
@@ -671,7 +676,7 @@ static void send_key_to_root(xcb_key_press_event_t *event, bool twice) {
     }
 
     xcb_grab_keyboard(conn, true, screen->root, XCB_CURRENT_TIME, XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC);
-    xcb_set_input_focus(conn, XCB_INPUT_FOCUS_PARENT /* revert_to */, win, XCB_CURRENT_TIME);
+    xcb_set_input_focus(conn, XCB_INPUT_FOCUS_PARENT, win, XCB_CURRENT_TIME);
 }
 
 /*
@@ -1567,6 +1572,7 @@ int main(int argc, char *argv[]) {
         {"pass-screen-keys", no_argument, NULL, 602},
         {"pass-power-keys", no_argument, NULL, 603},
         {"pass-volume-keys", no_argument, NULL, 604},
+        {"special-passthrough", no_argument, NULL, 605},
 
         // bar indicator stuff
         {"bar-indicator", no_argument, NULL, 700},
@@ -2128,6 +2134,9 @@ int main(int argc, char *argv[]) {
 			case 604:
 				pass_volume_keys = true;
 				break;
+            case 605:
+                special_passthrough = true;
+                break;
 
 			// Bar indicator
             case 700:
