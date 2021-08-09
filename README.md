@@ -133,7 +133,7 @@ Unfortunately the previous maintainer left, and the package got dumped back into
 i3lock-color is available on **GURU**, under [`x11-misc/i3lock-color`](https://github.com/gentoo/guru/tree/master/x11-misc/i3lock-color).
 
 ## FreeBSD port
-~~[i3lock-color-port](https://github.com/rkashapov/i3lock-color-port/)~~ (severely out of date).
+New 2021 port on freshports: [x11/i3lock-color/](https://www.freshports.org/x11/i3lock-color/)
 
 ## Running i3lock-color
 Simply invoke the 'i3lock' command. To get out of it, enter your password and press enter.
