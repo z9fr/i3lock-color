@@ -1,6 +1,6 @@
 #!/bin/sh -x
 
-configureOpts="--disable-sanitizers"
+configureOpts="--disable-sanitizers --disable-debug"
 
 while getopts ":hd" opt; do
   case ${opt} in
