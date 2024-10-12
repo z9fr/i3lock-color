@@ -24,7 +24,7 @@
 ### The world's most popular non-default computer lockscreen.
 **A modern version of i3lock with color functionality and other features.**
 
-![i3lock-color in action](examples/screenshot.png "Screenshot sample")
+![i3lock-color in action](examples/screenshot_2024.png "Screenshot sample")
 
 **NEW: Official Discord server at https://discord.gg/FzVPghyDt2**
 
