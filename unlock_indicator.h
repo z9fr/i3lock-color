@@ -31,6 +31,7 @@ typedef struct {
     text_t time_text;
     text_t date_text;
     text_t greeter_text;
+    text_t custom_text;
 
     double indicator_x, indicator_y;
 
@@ -46,7 +47,6 @@ typedef enum {
     SCALE,
     MAX,
 } background_type_t;
-
 
 typedef enum {
     CC_POS_RESET,

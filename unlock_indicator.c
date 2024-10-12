@@ -139,6 +139,8 @@ extern char modif_x_expr[32];
 extern char modif_y_expr[32];
 extern char greeter_x_expr[32];
 extern char greeter_y_expr[32];
+extern char custom_x_expr[32];
+extern char custom_y_expr[32];
 
 extern double time_size;
 extern double date_size;
@@ -147,6 +149,7 @@ extern double wrong_size;
 extern double modifier_size;
 extern double layout_size;
 extern double greeter_size;
+extern double custom_text_size;
 
 extern double timeoutlinewidth;
 extern double dateoutlinewidth;
@@ -155,6 +158,7 @@ extern double wrongoutlinewidth;
 extern double modifieroutlinewidth;
 extern double layoutoutlinewidth;
 extern double greeteroutlinewidth;
+extern double customtextoutlinewidth;
 
 extern char *verif_text;
 extern char *wrong_text;
@@ -163,9 +167,10 @@ extern char *lock_text;
 extern char *lock_failed_text;
 extern char *layout_text;
 extern char *greeter_text;
+extern char *custom_text;
 
 bool load_slideshow_images(const char *path);
-cairo_surface_t* load_image(char* image_path);
+cairo_surface_t *load_image(char *image_path);
 
 /* Whether the failed attempts should be displayed. */
 extern bool show_failed_attempts;
@@ -342,7 +347,7 @@ static void draw_text_with_cc(cairo_t *ctx, text_t text, double start_x) {
 
     // convert text to glyphs.
     cairo_status_t status;
-    cairo_glyph_t* glyphs;
+    cairo_glyph_t *glyphs;
     int nglyphs = 0,
         len = 0,
         start = 0,
@@ -355,18 +360,17 @@ static void draw_text_with_cc(cairo_t *ctx, text_t text, double start_x) {
         char is_cc = 0;
         do {
             for (cur_cc = 0; cur_cc < control_char_count; cur_cc++) {
-                if (text.str[start+len] == control_characters[cur_cc].character) {
+                if (text.str[start + len] == control_characters[cur_cc].character) {
                     is_cc = 1;
                     break;
                 }
             }
-        } while (text.str[start+(len++)] != '\0' && !is_cc);
+        } while (text.str[start + (len++)] != '\0' && !is_cc);
         if (len > is_cc) {
             status = cairo_scaled_font_text_to_glyphs(
-                sft, x, y, text.str + start, is_cc ? len - 1: len,
+                sft, x, y, text.str + start, is_cc ? len - 1 : len,
                 &glyphs, &nglyphs,
-                NULL, NULL, NULL
-            );
+                NULL, NULL, NULL);
             if (status == CAIRO_STATUS_SUCCESS) {
                 cairo_glyph_path(ctx, glyphs, nglyphs);
             } else {
@@ -377,27 +381,27 @@ static void draw_text_with_cc(cairo_t *ctx, text_t text, double start_x) {
             if (control_characters[cur_cc].x_behavior == CC_POS_CHANGE) {
                 char x_offset = control_characters[cur_cc].x_behavior_arg;
                 if (x_offset < 0 && x_offset > -nglyphs) {
-                    x = glyphs[nglyphs+x_offset].x;
+                    x = glyphs[nglyphs + x_offset].x;
                 } else if (x_offset > 0) {
-                    if (nglyphs >= 1) { // the case is some leading control chars.(although there is none now)
+                    if (nglyphs >= 1) {  // the case is some leading control chars.(although there is none now)
                         x = glyphs[nglyphs - 1].x + x_offset * te.x_advance;
-                    } else { // deal the leading control chars.
+                    } else {  // deal the leading control chars.
                         x += x_offset * te.x_advance;
                     }
                 }
             } else if (control_characters[cur_cc].x_behavior == CC_POS_RESET) {
                 x = start_x;
             } else if (control_characters[cur_cc].x_behavior == CC_POS_TAB) {
-                if (nglyphs > 0) { // there may be leading tab, such as '\t\t' or '\n\t'
+                if (nglyphs > 0) {  // there may be leading tab, such as '\t\t' or '\n\t'
                     int advance = control_characters[cur_cc].x_behavior_arg - ((nglyphs - 1) % control_characters[cur_cc].x_behavior_arg);
                     x = glyphs[nglyphs - 1].x + advance * te.x_advance;
-                } else { // deal the leading tab.
+                } else {  // deal the leading tab.
                     x += control_characters[cur_cc].x_behavior_arg * te.x_advance;
                 }
             }
             if (control_characters[cur_cc].y_behavior == CC_POS_CHANGE) {
                 lineno += control_characters[cur_cc].y_behavior_arg;
-            } // CC_POS_KEEP is default for y
+            }  // CC_POS_KEEP is default for y
         }
         y = text.y + text.size * lineno;
         if (len > is_cc) {
@@ -462,7 +466,6 @@ static void draw_single_bar(cairo_t *ctx, double pos, double offset, double widt
 }
 
 static void draw_bar(cairo_t *ctx, double bar_x, double bar_y, double bar_width, double screen_x, double screen_y) {
-
     cairo_save(ctx);
 
     switch (auth_state) {
@@ -503,7 +506,8 @@ static void draw_bar(cairo_t *ctx, double bar_x, double bar_y, double bar_width,
 
     for (int i = 0; i < bar_count; ++i) {
         double bar_height = bar_heights[i];
-        if (bar_bidirectional) bar_height *= 2;
+        if (bar_bidirectional)
+            bar_height *= 2;
         if (bar_height > 0) {
             draw_single_bar(ctx, bar_pos + i * base_width, bar_offset, base_width, bar_height);
         }
@@ -590,7 +594,7 @@ static void draw_indic(cairo_t *ctx, double ind_x, double ind_y) {
         cairo_stroke(ctx);
 
         /* Draw an inner separator line. */
-        if (internal_line_source != 2) {  //pretty sure this only needs drawn if it's being drawn over the inside?
+        if (internal_line_source != 2) {  // pretty sure this only needs drawn if it's being drawn over the inside?
             cairo_set_source_rgba(ctx, line16.red, line16.green, line16.blue, line16.alpha);
             cairo_set_line_width(ctx, 2.0);
             cairo_arc(ctx, ind_x, ind_y, BUTTON_RADIUS - 5, 0, 2 * M_PI);
@@ -665,7 +669,6 @@ static void colorgen(rgba_str_t *tmp, const char *src, rgba_t *dest) {
 }
 
 void init_colors_once(void) {
-
     /* initialize for slideshow time interval */
     lastCheck = (unsigned long)time(NULL);
 
@@ -755,6 +758,7 @@ static void draw_elements(cairo_t *const ctx, DrawData const *const draw_data) {
     draw_text(ctx, draw_data->time_text);
     draw_text(ctx, draw_data->date_text);
     draw_text(ctx, draw_data->greeter_text);
+    draw_text(ctx, draw_data->custom_text);
 }
 
 /*
@@ -764,7 +768,7 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
     const double scaling_factor = get_dpi_value() / 96.0;
     int button_diameter_physical = ceil(scaling_factor * BUTTON_DIAMETER);
     DEBUG("scaling_factor is %.f, physical diameter is %d px\n",
-        scaling_factor, button_diameter_physical);
+          scaling_factor, button_diameter_physical);
 
     if (!vistype)
         vistype = get_visualtype_by_depth(32, screen);
@@ -924,10 +928,21 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
         strncpy(draw_data.greeter_text.str, greeter_text, sizeof(draw_data.greeter_text.str) - 1);
         draw_data.greeter_text.size = greeter_size;
         draw_data.greeter_text.outline_width = greeteroutlinewidth;
-        draw_data.greeter_text.font = get_font_face(GREETER_FONT);
+        draw_data.greeter_text.font = get_font_face(LAYOUT_FONT);
         draw_data.greeter_text.color = greeter16;
         draw_data.greeter_text.outline_color = greeteroutline16;
         draw_data.greeter_text.align = greeter_align;
+    }
+
+    if (custom_text) {
+        draw_data.custom_text.show = true;
+        strncpy(draw_data.custom_text.str, custom_text, sizeof(draw_data.custom_text.str) - 1);
+        draw_data.custom_text.size = custom_text_size;
+        draw_data.custom_text.outline_width = customtextoutlinewidth;
+        draw_data.greeter_text.font = get_font_face(LAYOUT_FONT);
+        draw_data.custom_text.color = greeter16;
+        draw_data.custom_text.outline_color = greeteroutline16;
+        draw_data.custom_text.align = greeter_align;
     }
 
     if (show_clock && (!draw_data.status_text.show || always_show_clock)) {
@@ -965,6 +980,16 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
             draw_data.greeter_text.outline_color = greeteroutline16;
             draw_data.greeter_text.font = get_font_face(GREETER_FONT);
             draw_data.greeter_text.align = greeter_align;
+        }
+
+        if (*draw_data.custom_text.str) {
+            draw_data.custom_text.show = true;
+            draw_data.custom_text.size = custom_text_size;
+            draw_data.custom_text.outline_width = customtextoutlinewidth;
+            draw_data.custom_text.color = greeter16;
+            draw_data.custom_text.outline_color = greeteroutline16;
+            draw_data.custom_text.font = get_font_face(GREETER_FONT);
+            draw_data.custom_text.align = greeter_align;
         }
     }
 
@@ -1016,6 +1041,8 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
 
     te_expr *te_greeter_x_expr = compile_expression("--greeterpos", greeter_x_expr, vars, vars_size);
     te_expr *te_greeter_y_expr = compile_expression("--greeterpos", greeter_y_expr, vars, vars_size);
+    te_expr *te_custom_x_expr = compile_expression("--custompos", custom_x_expr, vars, vars_size);
+    te_expr *te_custom_y_expr = compile_expression("--custompos", custom_y_expr, vars, vars_size);
 
     if (xr_screens > 0) {
         if (screen_number < 0 || screen_number > xr_screens) {
@@ -1035,6 +1062,8 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
             draw_data.date_text.y = 0;
             draw_data.greeter_text.x = 0;
             draw_data.greeter_text.y = 0;
+            draw_data.custom_text.x = 0;
+            draw_data.custom_text.y = 0;
 
             width = xr_resolutions[current_screen].width / scaling_factor;
             height = xr_resolutions[current_screen].height / scaling_factor;
@@ -1052,6 +1081,8 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
             draw_data.keylayout_text.y = te_eval(te_layout_y_expr);
             draw_data.greeter_text.x = te_eval(te_greeter_x_expr);
             draw_data.greeter_text.y = te_eval(te_greeter_y_expr);
+            draw_data.custom_text.x = te_eval(te_custom_x_expr);
+            draw_data.custom_text.y = te_eval(te_custom_y_expr);
 
             switch (auth_state) {
                 case STATE_AUTH_VERIFY:
@@ -1093,7 +1124,6 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
             else
                 draw_data.bar_width = width;
 
-
             DEBUG("Indicator at %fx%f on screen %d\n", draw_data.indicator_x, draw_data.indicator_y, current_screen + 1);
             DEBUG("Bar at %fx%f with width %f on screen %d\n", draw_data.bar_x, draw_data.bar_y, draw_data.bar_width, current_screen + 1);
             DEBUG("Time at %fx%f on screen %d\n", draw_data.time_text.x, draw_data.time_text.y, current_screen + 1);
@@ -1123,6 +1153,9 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
         draw_data.keylayout_text.y = te_eval(te_layout_y_expr);
         draw_data.greeter_text.x = te_eval(te_greeter_x_expr);
         draw_data.greeter_text.y = te_eval(te_greeter_y_expr);
+        draw_data.custom_text.x = te_eval(te_custom_x_expr);
+        draw_data.custom_text.y = te_eval(te_custom_y_expr);
+
         switch (auth_state) {
             case STATE_AUTH_VERIFY:
             case STATE_AUTH_LOCK:
@@ -1209,8 +1242,7 @@ void render_lock(uint32_t *resolution, xcb_drawable_t drawable) {
  * Draws the configured image on the provided context. The image is drawn centered on all monitors, tiled, or just
  * painted starting from 0,0. It is also scaled if bg_type is FILL, MAX, or SCALE.
  */
-void draw_image(uint32_t* root_resolution, cairo_surface_t *img, cairo_t* xcb_ctx) {
-
+void draw_image(uint32_t *root_resolution, cairo_surface_t *img, cairo_t *xcb_ctx) {
     if (bg_type == NONE) {
         // Don't do any image manipulation
         cairo_set_source_surface(xcb_ctx, img, 0, 0);
@@ -1233,8 +1265,8 @@ void draw_image(uint32_t* root_resolution, cairo_surface_t *img, cairo_t* xcb_ct
             scale_y = xr_resolutions[i].height / image_height;
 
         } else if (bg_type == MAX || bg_type == FILL) {
-            double aspect_diff = (double) xr_resolutions[i].height / xr_resolutions[i].width - image_height / image_width;
-            if((bg_type == MAX && aspect_diff >= 0) || (bg_type == FILL && aspect_diff <= 0)) {
+            double aspect_diff = (double)xr_resolutions[i].height / xr_resolutions[i].width - image_height / image_width;
+            if ((bg_type == MAX && aspect_diff >= 0) || (bg_type == FILL && aspect_diff <= 0)) {
                 scale_x = scale_y = xr_resolutions[i].width / image_width;
             } else if ((bg_type == MAX && aspect_diff < 0) || (bg_type == FILL && aspect_diff > 0)) {
                 scale_x = scale_y = xr_resolutions[i].height / image_height;
@@ -1243,7 +1275,7 @@ void draw_image(uint32_t* root_resolution, cairo_surface_t *img, cairo_t* xcb_ct
 
         // Scale and translate the pattern
         cairo_matrix_t matrix;
-        cairo_matrix_init_scale(&matrix, 1/scale_x, 1/scale_y);
+        cairo_matrix_init_scale(&matrix, 1 / scale_x, 1 / scale_y);
 
         if (bg_type == TILE) {
             // Start image from top-left corner
@@ -1251,8 +1283,8 @@ void draw_image(uint32_t* root_resolution, cairo_surface_t *img, cairo_t* xcb_ct
         } else {
             // Draw image in the center of the screen
             cairo_matrix_translate(&matrix,
-                (image_width  * scale_x - xr_resolutions[i].width ) / 2 - xr_resolutions[i].x,
-                (image_height * scale_y - xr_resolutions[i].height) / 2 - xr_resolutions[i].y);
+                                   (image_width * scale_x - xr_resolutions[i].width) / 2 - xr_resolutions[i].x,
+                                   (image_height * scale_y - xr_resolutions[i].height) / 2 - xr_resolutions[i].y);
         }
 
         cairo_pattern_set_matrix(pattern, &matrix);

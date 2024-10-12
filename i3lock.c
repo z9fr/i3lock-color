@@ -109,7 +109,7 @@ int internal_line_source = 0;
 /* refresh rate in seconds, default to 1s */
 float refresh_rate = 1.0;
 
-bool show_clock = false;
+bool show_clock = true;
 bool slideshow_enabled = false;
 bool always_show_clock = false;
 bool show_indicator = false;
@@ -133,6 +133,7 @@ int date_align = 0;
 int layout_align = 0;
 int modif_align = 0;
 int greeter_align = 0;
+int custom_text_align = 0;
 
 char time_format[32] = "%H:%M:%S\0";
 char date_format[32] = "%A, %m %Y\0";
@@ -143,15 +144,15 @@ char layout_font[64] = "sans-serif\0";
 char time_font[64] = "sans-serif\0";
 char date_font[64] = "sans-serif\0";
 char greeter_font[64] = "sans-serif\0";
+char custom_text_font[64] = "sans-serif\0";
 
-char* fonts[6] = {
+char *fonts[6] = {
     verif_font,
     wrong_font,
     layout_font,
     time_font,
     date_font,
-    greeter_font
-};
+    greeter_font};
 
 char ind_x_expr[32] = "x + (w / 2)\0";
 char ind_y_expr[32] = "y + (h / 2)\0";
@@ -171,6 +172,8 @@ char wrong_x_expr[32] = "ix\0";
 char wrong_y_expr[32] = "iy\0";
 char greeter_x_expr[32] = "ix\0";
 char greeter_y_expr[32] = "iy\0";
+char custom_x_expr[32] = "ix\0";
+char custom_y_expr[32] = "iy+80\0";
 
 double time_size = 32.0;
 double date_size = 14.0;
@@ -181,6 +184,7 @@ double layout_size = 14.0;
 double circle_radius = 90.0;
 double ring_width = 7.0;
 double greeter_size = 32.0;
+double custom_text_size = 16.0;
 
 double timeoutlinewidth = 0;
 double dateoutlinewidth = 0;
@@ -189,15 +193,17 @@ double wrongoutlinewidth = 0;
 double modifieroutlinewidth = 0;
 double layoutoutlinewidth = 0;
 double greeteroutlinewidth = 0;
+double customtextoutlinewidth = 0;
 
-char* verif_text = "verifying…";
-char* wrong_text = "wrong!";
-char* noinput_text = "no input";
-char* lock_text = "locking…";
-char* lock_failed_text = "lock failed!";
-int   keylayout_mode = -1;
-char* layout_text = NULL;
-char* greeter_text = "";
+char *verif_text = "verifying…";
+char *wrong_text = "wrong!";
+char *noinput_text = "no input";
+char *lock_text = "locking…";
+char *lock_failed_text = "lock failed!";
+int keylayout_mode = -1;
+char *layout_text = NULL;
+char *greeter_text = "";
+char *custom_text = "";
 
 /* opts for blurring */
 bool blur = false;
@@ -264,23 +270,23 @@ bool pass_power_keys = false;
 bool pass_volume_keys = false;
 
 bool hotkeys = false;
-char* cmd_brightness_up = NULL;
-char* cmd_brightness_down = NULL;
+char *cmd_brightness_up = NULL;
+char *cmd_brightness_down = NULL;
 
-char* cmd_media_play = NULL;
-char* cmd_media_pause = NULL;
-char* cmd_media_stop = NULL;
-char* cmd_media_next = NULL;
-char* cmd_media_prev = NULL;
+char *cmd_media_play = NULL;
+char *cmd_media_pause = NULL;
+char *cmd_media_stop = NULL;
+char *cmd_media_next = NULL;
+char *cmd_media_prev = NULL;
 
-char* cmd_audio_mute = NULL;
-char* cmd_volume_up = NULL;
-char* cmd_volume_down = NULL;
-char* cmd_mic_mute = NULL;
+char *cmd_audio_mute = NULL;
+char *cmd_volume_up = NULL;
+char *cmd_volume_down = NULL;
+char *cmd_mic_mute = NULL;
 
-char* cmd_power_down = NULL;
-char* cmd_power_off = NULL;
-char* cmd_power_sleep = NULL;
+char *cmd_power_down = NULL;
+char *cmd_power_off = NULL;
+char *cmd_power_sleep = NULL;
 
 // for the rendering thread, so we can clean it up
 pthread_t draw_thread;
@@ -308,13 +314,13 @@ int bar_orientation = BAR_FLAT;
 
 char bar_base_color[9] = "000000ff";
 char bar_x_expr[32] = "0";
-char bar_y_expr[32] = ""; // empty string on y means use x as offset based on orientation
-char bar_width_expr[32] = ""; // empty string means full width based on bar orientation
+char bar_y_expr[32] = "";      // empty string on y means use x as offset based on orientation
+char bar_width_expr[32] = "";  // empty string means full width based on bar orientation
 bool bar_bidirectional = false;
 bool bar_reversed = false;
 
 /* isutf, u8_dec © 2005 Jeff Bezanson, public domain */
-#define isutf(c) (((c)&0xC0) != 0x80)
+#define isutf(c) (((c) & 0xC0) != 0x80)
 
 /*
  * Checks if the given path leads to an actual file or something else, e.g. a directory
@@ -343,8 +349,9 @@ static void u8_dec(char *s, int *i) {
  * credit to the XKB/xcb implementation (no libx11) from https://gist.github.com/bluetech/6061368
  * docs are really sparse, so finding some random implementation was nice
  */
-static char* get_keylayoutname(int mode, xcb_connection_t* conn) {
-    if (mode < 0 || mode > 2) return NULL;
+static char *get_keylayoutname(int mode, xcb_connection_t *conn) {
+    if (mode < 0 || mode > 2)
+        return NULL;
     char *newans = NULL, *newans2 = NULL, *answer = xcb_get_key_group_names(conn);
     int substringStart = 0, substringEnd = 0, size = 0;
     DEBUG("keylayout answer is: [%s]\n", answer);
@@ -704,7 +711,7 @@ static void handle_key_press(xcb_key_press_event_t *event) {
                 return;
             case XKB_COMPOSE_COMPOSED:
                 /* xkb_compose_state_get_utf8 doesn't include the terminating byte in the return value
-             * as xkb_keysym_to_utf8 does. Adding one makes the variable n consistent. */
+                 * as xkb_keysym_to_utf8 does. Adding one makes the variable n consistent. */
                 n = xkb_compose_state_get_utf8(xkb_compose_state, buffer, sizeof(buffer)) + 1;
                 ksym = xkb_compose_state_get_one_sym(xkb_compose_state);
                 composed = true;
@@ -722,9 +729,9 @@ static void handle_key_press(xcb_key_press_event_t *event) {
     n = xkb_keysym_to_utf8(ksym, buffer, sizeof(buffer));
 #endif
 
-    //custom key commands
+    // custom key commands
     if (hotkeys) {
-        switch(ksym) {
+        switch (ksym) {
             case XKB_KEY_XF86MonBrightnessUp:
                 if (cmd_brightness_up) {
                     system(cmd_brightness_up);
@@ -814,7 +821,7 @@ static void handle_key_press(xcb_key_press_event_t *event) {
 
     // media keys
     if (pass_media_keys) {
-        switch(ksym) {
+        switch (ksym) {
             case XKB_KEY_XF86AudioPlay:
             case XKB_KEY_XF86AudioPause:
             case XKB_KEY_XF86AudioStop:
@@ -829,9 +836,9 @@ static void handle_key_press(xcb_key_press_event_t *event) {
         }
     }
 
-	// screen keys
+    // screen keys
     if (pass_screen_keys) {
-        switch(ksym) {
+        switch (ksym) {
             case XKB_KEY_XF86MonBrightnessUp:
             case XKB_KEY_XF86MonBrightnessDown:
                 xcb_send_event(conn, true, screen->root, XCB_EVENT_MASK_BUTTON_PRESS, (char *)event);
@@ -839,9 +846,9 @@ static void handle_key_press(xcb_key_press_event_t *event) {
         }
     }
 
-	// power keys
+    // power keys
     if (pass_power_keys) {
-        switch(ksym) {
+        switch (ksym) {
             case XKB_KEY_XF86PowerDown:
             case XKB_KEY_XF86PowerOff:
             case XKB_KEY_XF86Sleep:
@@ -852,7 +859,7 @@ static void handle_key_press(xcb_key_press_event_t *event) {
 
     // volume keys
     if (pass_volume_keys) {
-        switch(ksym) {
+        switch (ksym) {
             case XKB_KEY_XF86AudioMute:
             case XKB_KEY_XF86AudioLowerVolume:
             case XKB_KEY_XF86AudioRaiseVolume:
@@ -1043,9 +1050,9 @@ static void process_xkb_event(xcb_generic_event_t *gevent) {
                                   event->state_notify.baseGroup,
                                   event->state_notify.latchedGroup,
                                   event->state_notify.lockedGroup);
-  			if (layout_text != NULL) {
-                  free(layout_text);
-                  layout_text = NULL;
+            if (layout_text != NULL) {
+                free(layout_text);
+                layout_text = NULL;
             }
             layout_text = get_keylayoutname(keylayout_mode, conn);
             redraw_screen();
@@ -1454,7 +1461,7 @@ static void raise_loop(xcb_window_t window) {
 /*
  * Loads an image from the given path. Handles JPEG and PNG. Returns NULL in case of error.
  */
-cairo_surface_t* load_image(char* image_path) {
+cairo_surface_t *load_image(char *image_path) {
     cairo_surface_t *img = NULL;
     JPEG_INFO jpg_info;
 
@@ -1467,12 +1474,12 @@ cairo_surface_t* load_image(char* image_path) {
         img = cairo_image_surface_create_from_png(image_path);
     } else if (file_is_jpg(image_path)) {
         DEBUG("Image looks like a jpeg, decoding\n");
-        unsigned char* jpg_data = read_JPEG_file(image_path, &jpg_info);
-            if (jpg_data != NULL) {
-                img = cairo_image_surface_create_for_data(jpg_data,
-                        CAIRO_FORMAT_ARGB32, jpg_info.width, jpg_info.height,
-                        jpg_info.stride);
-            }
+        unsigned char *jpg_data = read_JPEG_file(image_path, &jpg_info);
+        if (jpg_data != NULL) {
+            img = cairo_image_surface_create_for_data(jpg_data,
+                                                      CAIRO_FORMAT_ARGB32, jpg_info.width, jpg_info.height,
+                                                      jpg_info.stride);
+        }
     }
 
     /* In case loading failed, we just pretend no -i was specified. */
@@ -1512,9 +1519,11 @@ bool load_slideshow_images(const char *path) {
     }
 
     while ((dir = readdir(d)) != NULL) {
-        if (file_count >= 256) break;
+        if (file_count >= 256)
+            break;
         int result = regexec(&reg, dir->d_name, 0, NULL, 0);
-        if (result) continue;
+        if (result)
+            continue;
 
         char path_to_image[256];
         strcpy(path_to_image, path);
@@ -1623,6 +1632,7 @@ int main(int argc, char *argv[]) {
         {"lock-text", required_argument, NULL, 516},
         {"lockfailed-text", required_argument, NULL, 517},
         {"greeter-text", required_argument, NULL, 518},
+        {"custom-text", required_argument, NULL, 950},
         {"no-modkey-text", no_argument, NULL, 519},
 
         // fonts
@@ -1652,6 +1662,7 @@ int main(int argc, char *argv[]) {
         {"modif-pos", required_argument, NULL, 546},
         {"ind-pos", required_argument, NULL, 547},
         {"greeter-pos", required_argument, NULL, 548},
+        {"custom-pos", required_argument, NULL, 549},
 
         // text outline width
         {"timeoutline-width", required_argument, NULL, 560},
@@ -1662,7 +1673,7 @@ int main(int argc, char *argv[]) {
         {"layoutoutline-width", required_argument, NULL, 565},
         {"greeteroutline-width", required_argument, NULL, 566},
 
-		// pass keys
+        // pass keys
         {"pass-media-keys", no_argument, NULL, 601},
         {"pass-screen-keys", no_argument, NULL, 602},
         {"pass-power-keys", no_argument, NULL, 603},
@@ -1723,26 +1734,27 @@ int main(int argc, char *argv[]) {
     char *optstring = "hvnbdc:p:ui:tCFLMeI:frsS:kB:m";
     char *arg = NULL;
     int opt = 0;
-    char padded[9] = "ffffffff"; \
+    char padded[9] = "ffffffff";
 
-#define parse_color(acolor)\
-    arg = optarg;\
-    if (arg[0] == '#') arg++;\
-    if (strlen(arg) == 6) {\
-      /* If 6 digits given, assume RGB and pad 0xff for alpha */\
-      strncpy( padded, arg, 6 );\
-      arg = padded;\
-    }\
-    if (strlen(arg) != 8 || sscanf(arg, "%08[0-9a-fA-F]", acolor) != 1)\
+#define parse_color(acolor)                                             \
+    arg = optarg;                                                       \
+    if (arg[0] == '#')                                                  \
+        arg++;                                                          \
+    if (strlen(arg) == 6) {                                             \
+        /* If 6 digits given, assume RGB and pad 0xff for alpha */      \
+        strncpy(padded, arg, 6);                                        \
+        arg = padded;                                                   \
+    }                                                                   \
+    if (strlen(arg) != 8 || sscanf(arg, "%08[0-9a-fA-F]", acolor) != 1) \
         errx(1, #acolor " is invalid, color must be given in 3 or 4-byte format: rrggbb[aa]\n");
 
-#define parse_outline_width(awidth)\
-    arg = optarg;\
-    if (sscanf(arg, "%lf", &awidth) != 1)\
-        errx(1, #awidth " must be a number\n");\
-    if (awidth < 0) {\
-        fprintf(stderr, #awidth " must be a positive double; ignoring...\n");\
-        awidth = 0;\
+#define parse_outline_width(awidth)                                           \
+    arg = optarg;                                                             \
+    if (sscanf(arg, "%lf", &awidth) != 1)                                     \
+        errx(1, #awidth " must be a number\n");                               \
+    if (awidth < 0) {                                                         \
+        fprintf(stderr, #awidth " must be a positive double; ignoring...\n"); \
+        awidth = 0;                                                           \
     }
 
     while ((o = getopt_long(argc, argv, optstring, longopts, &longoptind)) != -1) {
@@ -1769,31 +1781,31 @@ int main(int argc, char *argv[]) {
                 image_path = strdup(optarg);
                 break;
             case 't':
-                if(bg_type != NONE) {
+                if (bg_type != NONE) {
                     errx(EXIT_FAILURE, "i3lock-color: Only one background type can be used.");
                 }
                 bg_type = TILE;
                 break;
             case 'C':
-                if(bg_type != NONE) {
+                if (bg_type != NONE) {
                     errx(EXIT_FAILURE, "i3lock-color: Only one background type can be used.");
                 }
                 bg_type = CENTER;
                 break;
             case 'F':
-                if(bg_type != NONE) {
+                if (bg_type != NONE) {
                     errx(EXIT_FAILURE, "i3lock-color: Only one background type can be used.");
                 }
                 bg_type = FILL;
                 break;
             case 'L':
-                if(bg_type != NONE) {
+                if (bg_type != NONE) {
                     errx(EXIT_FAILURE, "i3lock-color: Only one background type can be used.");
                 }
                 bg_type = SCALE;
                 break;
             case 'M':
-                if(bg_type != NONE) {
+                if (bg_type != NONE) {
                     errx(EXIT_FAILURE, "i3lock-color: Only one background type can be used.");
                 }
                 bg_type = MAX;
@@ -1815,13 +1827,13 @@ int main(int argc, char *argv[]) {
                 break;
             case 'r':
                 if (internal_line_source != 0) {
-                  errx(EXIT_FAILURE, "i3lock-color: Options line-uses-ring and line-uses-inside conflict.");
+                    errx(EXIT_FAILURE, "i3lock-color: Options line-uses-ring and line-uses-inside conflict.");
                 }
-                internal_line_source = 1; //sets the line drawn inside to use the inside color when drawn
+                internal_line_source = 1;  // sets the line drawn inside to use the inside color when drawn
                 break;
             case 's':
                 if (internal_line_source != 0) {
-                  errx(EXIT_FAILURE, "i3lock-color: Options line-uses-ring and line-uses-inside conflict.");
+                    errx(EXIT_FAILURE, "i3lock-color: Options line-uses-ring and line-uses-inside conflict.");
                 }
                 internal_line_source = 2;
                 break;
@@ -1889,33 +1901,32 @@ int main(int argc, char *argv[]) {
             case 315:
                 parse_color(greetercolor);
                 break;
-            case  316:
+            case 316:
                 parse_color(verifoutlinecolor);
                 break;
-            case  317:
+            case 317:
                 parse_color(wrongoutlinecolor);
                 break;
-            case  318:
+            case 318:
                 parse_color(layoutoutlinecolor);
                 break;
-            case  319:
+            case 319:
                 parse_color(timeoutlinecolor);
                 break;
-            case  320:
+            case 320:
                 parse_color(dateoutlinecolor);
                 break;
-            case  321:
+            case 321:
                 parse_color(greeteroutlinecolor);
                 break;
-            case  322:
+            case 322:
                 parse_color(modifcolor);
                 break;
-            case  323:
+            case 323:
                 parse_color(modifoutlinecolor);
                 break;
 
-
-			// General indicator opts
+                // General indicator opts
             case 400:
                 show_clock = true;
                 always_show_clock = true;
@@ -1942,55 +1953,62 @@ int main(int argc, char *argv[]) {
                 }
                 break;
 
-			// Alignment stuff
+                // Alignment stuff
             case 500:
                 opt = atoi(optarg);
-                if (opt < 0 || opt > 2) opt = 0;
+                if (opt < 0 || opt > 2)
+                    opt = 0;
                 time_align = opt;
                 break;
             case 501:
                 opt = atoi(optarg);
-                if (opt < 0 || opt > 2) opt = 0;
+                if (opt < 0 || opt > 2)
+                    opt = 0;
                 date_align = opt;
                 break;
             case 502:
                 opt = atoi(optarg);
-                if (opt < 0 || opt > 2) opt = 0;
+                if (opt < 0 || opt > 2)
+                    opt = 0;
                 verif_align = opt;
                 break;
             case 503:
                 opt = atoi(optarg);
-                if (opt < 0 || opt > 2) opt = 0;
+                if (opt < 0 || opt > 2)
+                    opt = 0;
                 wrong_align = opt;
                 break;
             case 504:
                 opt = atoi(optarg);
-                if (opt < 0 || opt > 2) opt = 0;
+                if (opt < 0 || opt > 2)
+                    opt = 0;
                 layout_align = opt;
                 break;
             case 505:
                 opt = atoi(optarg);
-                if (opt < 0 || opt > 2) opt = 0;
+                if (opt < 0 || opt > 2)
+                    opt = 0;
                 modif_align = opt;
                 break;
             case 506:
                 opt = atoi(optarg);
-                if (opt < 0 || opt > 2) opt = 0;
+                if (opt < 0 || opt > 2)
+                    opt = 0;
                 greeter_align = opt;
                 break;
 
-			// String stuff
+                // String stuff
             case 510:
                 if (strlen(optarg) > 31) {
                     errx(1, "time format string can be at most 31 characters\n");
                 }
-                strcpy(time_format,optarg);
+                strcpy(time_format, optarg);
                 break;
             case 511:
                 if (strlen(optarg) > 31) {
                     errx(1, "time format string can be at most 31 characters\n");
                 }
-                strcpy(date_format,optarg);
+                strcpy(date_format, optarg);
                 break;
             case 512:
                 verif_text = optarg;
@@ -2016,51 +2034,54 @@ int main(int argc, char *argv[]) {
             case 518:
                 greeter_text = optarg;
                 break;
+            case 950:
+                custom_text = optarg;
+                break;
             case 519:
                 show_modkey_text = false;
                 break;
 
-			// Font stuff
+                // Font stuff
             case 520:
                 if (strlen(optarg) > 63) {
                     errx(1, "time font string can be at most 63 characters\n");
                 }
-                strcpy(fonts[TIME_FONT],optarg);
+                strcpy(fonts[TIME_FONT], optarg);
                 break;
             case 521:
                 if (strlen(optarg) > 63) {
                     errx(1, "date font string can be at most 63 characters\n");
                 }
-                strcpy(fonts[DATE_FONT],optarg);
+                strcpy(fonts[DATE_FONT], optarg);
                 break;
             case 522:
                 if (strlen(optarg) > 63) {
                     errx(1, "verif font string can be at most 63 "
                             "characters\n");
                 }
-                strcpy(fonts[VERIF_FONT],optarg);
+                strcpy(fonts[VERIF_FONT], optarg);
                 break;
             case 523:
                 if (strlen(optarg) > 63) {
                     errx(1, "wrong font string can be at most 63 "
                             "characters\n");
                 }
-                strcpy(fonts[WRONG_FONT],optarg);
+                strcpy(fonts[WRONG_FONT], optarg);
                 break;
             case 524:
                 if (strlen(optarg) > 63) {
                     errx(1, "layout font string can be at most 63 characters\n");
                 }
-                strcpy(fonts[LAYOUT_FONT],optarg);
+                strcpy(fonts[LAYOUT_FONT], optarg);
                 break;
             case 525:
                 if (strlen(optarg) > 63) {
                     errx(1, "greeter font string can be at most 63 characters\n");
                 }
-                strcpy(fonts[GREETER_FONT],optarg);
+                strcpy(fonts[GREETER_FONT], optarg);
                 break;
 
-			// Text size
+                // Text size
             case 530:
                 arg = optarg;
                 if (sscanf(arg, "%lf", &time_size) != 1)
@@ -2119,9 +2140,9 @@ int main(int argc, char *argv[]) {
                 }
                 break;
 
-			// Positions
+                // Positions
             case 540:
-                //read in to time_x_expr and time_y_expr
+                // read in to time_x_expr and time_y_expr
                 if (strlen(optarg) > 31) {
                     // this is overly restrictive since both the x and y string buffers have size 32, but it's easier to check.
                     errx(1, "time position string can be at most 31 characters\n");
@@ -2132,7 +2153,7 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             case 541:
-                //read in to date_x_expr and date_y_expr
+                // read in to date_x_expr and date_y_expr
                 if (strlen(optarg) > 31) {
                     // this is overly restrictive since both the x and y string buffers have size 32, but it's easier to check.
                     errx(1, "date position string can be at most 31 characters\n");
@@ -2210,6 +2231,16 @@ int main(int argc, char *argv[]) {
                     errx(1, "greeterpos must be of the form x:y\n");
                 }
                 break;
+            case 549:
+                if (strlen(optarg) > 31) {
+                    // this is overly restrictive since both the x and y string buffers have size 32, but it's easier to check.
+                    errx(1, "custom position string can be at most 31 characters\n");
+                }
+                arg = optarg;
+                if (sscanf(arg, "%30[^:]:%30[^:]", custom_x_expr, custom_y_expr) != 2) {
+                    errx(1, "custom pos must be of the form x:y\n");
+                }
+                break;
 
             // text outline width
             case 560:
@@ -2234,22 +2265,21 @@ int main(int argc, char *argv[]) {
                 parse_outline_width(greeteroutlinewidth);
                 break;
 
+            // Pass keys
+            case 601:
+                pass_media_keys = true;
+                break;
+            case 602:
+                pass_screen_keys = true;
+                break;
+            case 603:
+                pass_power_keys = true;
+                break;
+            case 604:
+                pass_volume_keys = true;
+                break;
 
-			// Pass keys
-			case 601:
-				pass_media_keys = true;
-				break;
-			case 602:
-				pass_screen_keys = true;
-				break;
-			case 603:
-				pass_power_keys = true;
-				break;
-			case 604:
-				pass_volume_keys = true;
-				break;
-
-            //custom key commands
+            // custom key commands
             case 610:
                 hotkeys = true;
                 break;
@@ -2299,13 +2329,13 @@ int main(int argc, char *argv[]) {
                 cmd_power_sleep = optarg;
                 break;
 
-			// Bar indicator
+                // Bar indicator
             case 700:
                 bar_enabled = true;
                 break;
             case 701:
                 opt = atoi(optarg);
-                switch(opt) {
+                switch (opt) {
                     case BAR_REVERSED:
                         bar_reversed = true;
                         break;
@@ -2328,15 +2358,18 @@ int main(int argc, char *argv[]) {
                 break;
             case 704:
                 bar_step = atoi(optarg);
-                if (bar_step < 1) bar_step = 15;
+                if (bar_step < 1)
+                    bar_step = 15;
                 break;
             case 705:
                 max_bar_height = atoi(optarg);
-                if (max_bar_height < 1) max_bar_height = 25;
+                if (max_bar_height < 1)
+                    max_bar_height = 25;
                 break;
             case 706:
                 bar_base_height = atoi(optarg);
-                if (bar_base_height < 1) bar_base_height = 25;
+                if (bar_base_height < 1)
+                    bar_base_height = 25;
                 break;
             case 707:
                 parse_color(bar_base_color);
@@ -2365,7 +2398,7 @@ int main(int argc, char *argv[]) {
                 }
                 break;
 
-			// Misc
+                // Misc
             case 900:
                 redraw_thread = true;
                 break;
@@ -2436,7 +2469,7 @@ int main(int argc, char *argv[]) {
     int screennr;
     if ((conn = xcb_connect(NULL, &screennr)) == NULL ||
         xcb_connection_has_error(conn))
-            errx(EXIT_FAILURE, "Could not connect to X11, maybe you need to set DISPLAY?");
+        errx(EXIT_FAILURE, "Could not connect to X11, maybe you need to set DISPLAY?");
 
     if (xkb_x11_setup_xkb_extension(conn,
                                     XKB_X11_MIN_MAJOR_XKB_VERSION,
@@ -2479,7 +2512,6 @@ int main(int argc, char *argv[]) {
     if (!load_keymap())
         errx(EXIT_FAILURE, "Could not load keymap");
 
-
     const char *locale = getenv("LC_ALL");
     if (!locale || !*locale)
         locale = getenv("LC_TIME");
@@ -2499,7 +2531,6 @@ int main(int argc, char *argv[]) {
     load_compose_table(locale);
 #endif
 
-
     screen = xcb_setup_roots_iterator(xcb_get_setup(conn)).data;
 
     init_dpi();
@@ -2511,7 +2542,7 @@ int main(int argc, char *argv[]) {
     last_resolution[1] = screen->height_in_pixels;
 
     if (bar_enabled) {
-        bar_heights = (double*) calloc(bar_count, sizeof(double));
+        bar_heights = (double *)calloc(bar_count, sizeof(double));
     }
 
     xcb_change_window_attributes(conn, screen->root, XCB_CW_EVENT_MASK,
@@ -2524,7 +2555,8 @@ int main(int argc, char *argv[]) {
         } else {
             /* Path to a directory is provided -> use slideshow mode */
             slideshow_path = strdup(image_path);
-            if (!load_slideshow_images(slideshow_path)) exit(EXIT_FAILURE);
+            if (!load_slideshow_images(slideshow_path))
+                exit(EXIT_FAILURE);
             img = load_image(img_slideshow[0]);
         }
 
@@ -2631,9 +2663,9 @@ int main(int argc, char *argv[]) {
             struct timespec ts;
             double s;
             double ns = modf(refresh_rate, &s);
-            ts.tv_sec = (time_t) s;
+            ts.tv_sec = (time_t)s;
             ts.tv_nsec = ns * NANOSECONDS_IN_SECOND;
-            (void) pthread_create(&draw_thread, NULL, start_time_redraw_tick_pthread, (void*) &ts);
+            (void)pthread_create(&draw_thread, NULL, start_time_redraw_tick_pthread, (void *)&ts);
         } else {
             start_time_redraw_tick(main_loop);
         }

@@ -62,6 +62,7 @@ You can also specify additional options, as detailed in the manpage. This includ
 - A new bar indicator, which replaces the ring indicator with its own set of options
 	- An experimental thread for driving the redraw ticks, so that things like the bar/clock still update when PAM is blocking
 - Any other feature you want (add it yourself through a PR or make a feature request issue!)
+- Added custom text options to display calender events
 
 ## Dependencies
 The following dependencies will need to be installed for a successful build, depending on your OS/distro.
